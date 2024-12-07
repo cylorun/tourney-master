@@ -14,8 +14,10 @@ import java.util.logging.Level;
 
 public class TourneyMasterOptions {
 
-    private int rows = 3;
-    private int cols = 3;
+    public short port = 4455;
+    public String password = "";
+    public int rows = 3;
+    public int cols = 3;
     public List<String> streamers = new ArrayList<>();
 
     public String lastView = "commentator"; // commentator | host
