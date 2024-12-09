@@ -7,7 +7,7 @@ shadowJar {
     from sourceSets.main.resources
 
     archiveBaseName.set("btrl-master")
-    archiveVersion.set(project.version as String)
+    archiveVersion.set("v"+project.version as String)
     archiveClassifier.set("")
 }
 

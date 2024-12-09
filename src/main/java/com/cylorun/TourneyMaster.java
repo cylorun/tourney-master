@@ -14,12 +14,10 @@ public class TourneyMaster {
     public static void main(String[] args) throws UnsupportedLookAndFeelException {
         UIManager.setLookAndFeel(new FlatDarculaLaf());
 
-
-        log(Level.INFO, "Yo");
+        log(Level.INFO, "Running Tourney-Master v" + VERSION);
 
         TourneyMasterWindow.getInstance();
     }
-
 
     public static void log(Level level, Object s) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S");

@@ -14,12 +14,13 @@ import java.util.logging.Level;
 
 public class TourneyMasterOptions {
 
-    public short port = 4455;
-    public String password = "";
+    public int obs_port = 4455;
+    public String obs_password = "";
+    public String obs_host = "localhost";
     public int rows = 3;
     public int cols = 3;
+    public boolean enable_commentators = false;
     public List<String> streamers = new ArrayList<>();
-
     public String lastView = "commentator"; // commentator | host
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = getTrackerDir().resolve("config.json");
@@ -49,7 +50,7 @@ public class TourneyMasterOptions {
     }
 
     public static Path getTrackerDir() {
-        return Paths.get(System.getProperty("user.home"), ".btrlmaster");
+        return Paths.get(System.getProperty("user.home"), ".tourneymaster");
     }
 
     public static void save() {

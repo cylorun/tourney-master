@@ -1,8 +1,11 @@
 package com.cylorun.gui;
 
 import com.cylorun.TourneyMasterOptions;
+import com.cylorun.gui.components.ActionButton;
 import com.cylorun.gui.components.BooleanOptionField;
 import com.cylorun.gui.components.TextOptionField;
+import com.cylorun.obs.OBSController;
+import io.obswebsocket.community.client.model.Scene;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,7 +23,7 @@ public class TourneyMasterWindow extends JFrame {
     private TourneyMasterWindow() {
         this.setTitle("Tourney Master " + com.cylorun.TourneyMaster.VERSION);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(800, 400);
+        this.setSize(800, 600);
         this.setLayout(new BorderLayout());
 
         this.initComponents();
@@ -48,35 +51,80 @@ public class TourneyMasterWindow extends JFrame {
         webhookPanel.add(webhookField);
         panel.add(webhookPanel, BorderLayout.NORTH);
 
-        panel.add(createStreamersPanel(), BorderLayout.CENTER);
+        panel.add(this.createStreamersPanel(), BorderLayout.CENTER);
 
-        panel.add(createSwitchViewButton("Switch to Host View"), BorderLayout.SOUTH);
+        JPanel southPanel = new JPanel(new BorderLayout());
+        southPanel.add(createSwitchScenePanel(), BorderLayout.CENTER);
+        southPanel.add(createSwitchViewButton("Switch to Host View"), BorderLayout.SOUTH);
 
+        panel.add(southPanel, BorderLayout.SOUTH);
         return panel;
     }
 
     private JPanel createHostView() {
-        JPanel panel = new JPanel(new BorderLayout());
+        TourneyMasterOptions options = TourneyMasterOptions.getInstance();
+        JPanel panel = new JPanel(new BorderLayout(10, 10)); // Add spacing
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
 
-        JPanel hostSettingsPanel = new JPanel();
-        hostSettingsPanel.setLayout(new GridLayout(4, 2, 5, 5));
+        // Host Settings Panel
+        JPanel hostSettingsPanel = new JPanel(new GridLayout(0, 2, 5, 5)); // Flexible rows
+        hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("Connection Settings"));
 
-        TextOptionField passwordField = new TextOptionField("WebSocket Password: ", "", true, (v) -> {});
-        hostSettingsPanel.add(passwordField);
+        TextOptionField hostField = new TextOptionField("WebSocket Hostname: ", options.obs_host, (newVal) -> {
+            options.obs_host = newVal;
+            TourneyMasterOptions.save();
+        });
+        hostSettingsPanel.add(hostField);
 
-        TextOptionField portField = new TextOptionField("WebSocket Port:", "", (v) -> {});
+        TextOptionField portField = new TextOptionField("WebSocket Port: ", String.valueOf(options.obs_port), (newVal) -> {
+            options.obs_port = Integer.parseInt(newVal);
+            TourneyMasterOptions.save();
+        }).numbersOnly();
         hostSettingsPanel.add(portField);
 
-        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators", true, (v) -> {});
+        TextOptionField passwordField = new TextOptionField("WebSocket Password: ", options.obs_password, true, (newVal) -> {
+            options.obs_password = newVal;
+            TourneyMasterOptions.save();
+        });
+        hostSettingsPanel.add(passwordField);
+
+        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators", options.enable_commentators, (newVal) -> {
+            options.enable_commentators = newVal;
+            TourneyMasterOptions.save();
+        });
         hostSettingsPanel.add(enableCommentatorsCheck);
 
-        hostSettingsPanel.add(new JLabel());
+        ActionButton connectButton = new ActionButton("Reconnect", (e) -> {
+            try {
+                OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
+            } catch (Exception err) {
+                err.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to connect to OBS WebSocket server: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        connectButton.setPreferredSize(new Dimension(120, 30)); // Set consistent button size
+        hostSettingsPanel.add(connectButton);
 
         panel.add(hostSettingsPanel, BorderLayout.NORTH);
 
-        panel.add(createStreamersPanel(), BorderLayout.CENTER);
+        // Streamers Panel
+        JPanel streamersPanel = createStreamersPanel();
+        streamersPanel.setBorder(BorderFactory.createTitledBorder("Stream Management"));
+        panel.add(streamersPanel, BorderLayout.CENTER);
 
-        panel.add(createSwitchViewButton("Switch to Commentator View"), BorderLayout.SOUTH);
+        // South Panel
+        JPanel southPanel = new JPanel(new BorderLayout(5, 5)); // Add spacing
+        JPanel switchScenePanel = createSwitchScenePanel();
+        switchScenePanel.setBorder(BorderFactory.createTitledBorder("Scene Control"));
+        southPanel.add(switchScenePanel, BorderLayout.CENTER);
+
+        JPanel switchViewButton = createSwitchViewButton("Switch to Commentator View");
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // Align to the right
+        buttonPanel.add(switchViewButton);
+
+        southPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        panel.add(southPanel, BorderLayout.SOUTH);
 
         return panel;
     }
@@ -104,6 +152,35 @@ public class TourneyMasterWindow extends JFrame {
         switchButton.addActionListener(this::switchView);
         switchPanel.add(switchButton);
         return switchPanel;
+    }
+
+    private JPanel createSwitchScenePanel() {
+        JPanel scenePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+
+
+        JComboBox<String> sceneBox = new JComboBox<>();
+        OBSController.getInstance().getSceneList((res) -> {
+            if (res == null) {
+                System.err.println("Failed to fetch scenes: response is null.");
+                return;
+            }
+            SwingUtilities.invokeLater(() -> {
+                for (Scene scene : res.getScenes()) {
+                    sceneBox.addItem(scene.getSceneName());
+                }
+                sceneBox.revalidate();
+                scenePanel.repaint();
+            });
+        });
+
+
+        sceneBox.addActionListener((e) -> {
+            OBSController.getInstance().openScene((String) sceneBox.getSelectedItem());
+        });
+
+        scenePanel.add(sceneBox);
+
+        return scenePanel;
     }
 
     private void switchView(ActionEvent event) {
