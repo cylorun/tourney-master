@@ -18,8 +18,6 @@ public class TourneyMasterWindow extends JFrame {
     private JPanel hostView;
     private JPanel currentView;
 
-    private JPanel streamersPanel;
-
     private TourneyMasterWindow() {
         this.setTitle("Tourney Master " + com.cylorun.TourneyMaster.VERSION);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -32,94 +30,37 @@ public class TourneyMasterWindow extends JFrame {
     }
 
     private void initComponents() {
-        this.commentatorView = createCommentatorView();
-        this.hostView = createHostView();
+        this.commentatorView =  this.createMainView("commentator");
+        this.hostView = this.createMainView("host");
 
-        // commentator view as default
         String lastView = TourneyMasterOptions.getInstance().lastView;
         this.currentView = lastView.equals("host") ? this.hostView : this.commentatorView;
 
         this.add(this.currentView, BorderLayout.CENTER);
     }
 
-    private JPanel createCommentatorView() {
-        JPanel panel = new JPanel(new BorderLayout());
 
-        JPanel webhookPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        webhookPanel.add(new JLabel("Webhook URL: "));
-        JTextField webhookField = new JTextField(30);
-        webhookPanel.add(webhookField);
-        panel.add(webhookPanel, BorderLayout.NORTH);
+    private JPanel createMainView(String role) {
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        panel.add(this.createStreamersPanel(), BorderLayout.CENTER);
+        if (role.equals("host")) {
+            panel.add(this.getHostConfigPanel(), BorderLayout.NORTH);
+        } else if (role.equals("commentator")) {
+            panel.add(this.createCommentatorConfigPanel(), BorderLayout.NORTH);
+        }
 
-        JPanel southPanel = new JPanel(new BorderLayout());
-        southPanel.add(createSwitchScenePanel(), BorderLayout.CENTER);
-        southPanel.add(createSwitchViewButton("Switch to Host View"), BorderLayout.SOUTH);
-
-        panel.add(southPanel, BorderLayout.SOUTH);
-        return panel;
-    }
-
-    private JPanel createHostView() {
-        TourneyMasterOptions options = TourneyMasterOptions.getInstance();
-        JPanel panel = new JPanel(new BorderLayout(10, 10)); // Add spacing
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Add padding
-
-        // Host Settings Panel
-        JPanel hostSettingsPanel = new JPanel(new GridLayout(0, 2, 5, 5)); // Flexible rows
-        hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("Connection Settings"));
-
-        TextOptionField hostField = new TextOptionField("WebSocket Hostname: ", options.obs_host, (newVal) -> {
-            options.obs_host = newVal;
-            TourneyMasterOptions.save();
-        });
-        hostSettingsPanel.add(hostField);
-
-        TextOptionField portField = new TextOptionField("WebSocket Port: ", String.valueOf(options.obs_port), (newVal) -> {
-            options.obs_port = Integer.parseInt(newVal);
-            TourneyMasterOptions.save();
-        }).numbersOnly();
-        hostSettingsPanel.add(portField);
-
-        TextOptionField passwordField = new TextOptionField("WebSocket Password: ", options.obs_password, true, (newVal) -> {
-            options.obs_password = newVal;
-            TourneyMasterOptions.save();
-        });
-        hostSettingsPanel.add(passwordField);
-
-        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators", options.enable_commentators, (newVal) -> {
-            options.enable_commentators = newVal;
-            TourneyMasterOptions.save();
-        });
-        hostSettingsPanel.add(enableCommentatorsCheck);
-
-        ActionButton connectButton = new ActionButton("Reconnect", (e) -> {
-            try {
-                OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
-            } catch (Exception err) {
-                err.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Failed to connect to OBS WebSocket server: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        connectButton.setPreferredSize(new Dimension(120, 30)); // Set consistent button size
-        hostSettingsPanel.add(connectButton);
-
-        panel.add(hostSettingsPanel, BorderLayout.NORTH);
-
-        // Streamers Panel
         JPanel streamersPanel = createStreamersPanel();
         streamersPanel.setBorder(BorderFactory.createTitledBorder("Stream Management"));
         panel.add(streamersPanel, BorderLayout.CENTER);
 
-        // South Panel
-        JPanel southPanel = new JPanel(new BorderLayout(5, 5)); // Add spacing
+        JPanel southPanel = new JPanel(new BorderLayout(5, 5));
         JPanel switchScenePanel = createSwitchScenePanel();
         switchScenePanel.setBorder(BorderFactory.createTitledBorder("Scene Control"));
         southPanel.add(switchScenePanel, BorderLayout.CENTER);
 
-        JPanel switchViewButton = createSwitchViewButton("Switch to Commentator View");
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); // Align to the right
+        JPanel switchViewButton = createSwitchViewButton(String.format("Switch to %s View", role.equals("host") ? "commentator" : "host"));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(switchViewButton);
 
         southPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -129,8 +70,9 @@ public class TourneyMasterWindow extends JFrame {
         return panel;
     }
 
+
     private JPanel createStreamersPanel() {
-        this.streamersPanel = new JPanel(new GridLayout(3, 3, 10, 10));
+        JPanel streamersPanel = new JPanel(new GridLayout(3, 3, 10, 10));
         for (int i = 0; i < 9; i++) {
             JPanel streamerPanel = new JPanel(new BorderLayout());
 
@@ -141,9 +83,10 @@ public class TourneyMasterWindow extends JFrame {
             JCheckBox activeCheck = new JCheckBox();
             streamerPanel.add(activeCheck, BorderLayout.EAST);
 
-            this.streamersPanel.add(streamerPanel);
+            streamersPanel.add(streamerPanel);
         }
-        return this.streamersPanel;
+
+        return streamersPanel;
     }
 
     private JPanel createSwitchViewButton(String buttonText) {
@@ -183,6 +126,83 @@ public class TourneyMasterWindow extends JFrame {
         return scenePanel;
     }
 
+    private JPanel createCommentatorConfigPanel() {
+        JPanel panel = new JPanel(new GridBagLayout());
+
+        return panel;
+    }
+
+    private JPanel getHostConfigPanel() {
+        TourneyMasterOptions options = TourneyMasterOptions.getInstance();
+        JPanel hostSettingsPanel = new JPanel(new GridBagLayout());
+
+        hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("Connection Settings"));
+
+        TextOptionField hostField = new TextOptionField("WebSocket Hostname: ", options.obs_host, (newVal) -> {
+            options.obs_host = newVal;
+            TourneyMasterOptions.save();
+        });
+        hostSettingsPanel.add(hostField);
+
+        TextOptionField portField = new TextOptionField("WebSocket Port: ", String.valueOf(options.obs_port), (newVal) -> {
+            options.obs_port = Integer.parseInt(newVal);
+            TourneyMasterOptions.save();
+        }).numbersOnly();
+        hostSettingsPanel.add(portField);
+
+        TextOptionField passwordField = new TextOptionField("WebSocket Password: ", options.obs_password, true, (newVal) -> {
+            options.obs_password = newVal;
+            TourneyMasterOptions.save();
+        });
+        hostSettingsPanel.add(passwordField);
+
+        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators", options.enable_commentators, (newVal) -> {
+            options.enable_commentators = newVal;
+            TourneyMasterOptions.save();
+        });
+        hostSettingsPanel.add(enableCommentatorsCheck);
+
+        ActionButton connectButton = new ActionButton("Reconnect", (e) -> {
+            try {
+                OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
+            } catch (Exception err) {
+                err.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Failed to connect to OBS WebSocket server: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        hostSettingsPanel.add(connectButton);
+
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5); // spacing
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        hostSettingsPanel.add(hostField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        hostSettingsPanel.add(portField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        hostSettingsPanel.add(passwordField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        hostSettingsPanel.add(enableCommentatorsCheck, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        hostSettingsPanel.add(connectButton, gbc);
+
+        return hostSettingsPanel;
+    }
+
     private void switchView(ActionEvent event) {
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to switch views?",
@@ -201,6 +221,7 @@ public class TourneyMasterWindow extends JFrame {
                 options.lastView = "commentator";
                 TourneyMasterOptions.save();
             }
+
             this.add(this.currentView, BorderLayout.CENTER);
             this.revalidate();
             this.repaint();
