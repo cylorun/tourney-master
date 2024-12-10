@@ -11,6 +11,8 @@ import io.obswebsocket.community.client.model.Scene;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TourneyMasterWindow extends JFrame {
     private static TourneyMasterWindow instance;
@@ -22,16 +24,18 @@ public class TourneyMasterWindow extends JFrame {
     private TourneyMasterWindow() {
         this.setTitle("Tourney Master " + com.cylorun.TourneyMaster.VERSION);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setSize(800, 600);
+        this.setSize(800, 650);
         this.setLayout(new BorderLayout());
 
         this.initComponents();
 
         this.setVisible(true);
+
+//        OBSController.getInstance(); // connects to obs
     }
 
     private void initComponents() {
-        this.commentatorView =  this.createMainView("commentator");
+        this.commentatorView = this.createMainView("commentator");
         this.hostView = this.createMainView("host");
 
         String lastView = TourneyMasterOptions.getInstance().lastView;
@@ -71,24 +75,9 @@ public class TourneyMasterWindow extends JFrame {
         return panel;
     }
 
-
-    private JPanel createStreamersPanel() {
+    private StreamerPanel createStreamersPanel() {
         TourneyMasterOptions options = TourneyMasterOptions.getInstance();
-        JPanel streamersPanel = new JPanel(new GridLayout(options.rows, options.cols, 10, 10));
-        for (int i = 0; i < options.rows * options.cols; i++) {
-            JPanel streamerPanel = new JPanel(new BorderLayout());
-
-            JComboBox<String> streamerDropdown = new JComboBox<>(options.streamers.toArray(new String[0]));
-
-            streamerPanel.add(streamerDropdown, BorderLayout.CENTER);
-
-            JCheckBox activeCheck = new JCheckBox();
-            streamerPanel.add(activeCheck, BorderLayout.EAST);
-
-            streamersPanel.add(streamerPanel);
-        }
-
-        return streamersPanel;
+        return new StreamerPanel(options.streamers, options.rows, options.cols);
     }
 
     private JPanel createSwitchViewButton(String buttonText) {
@@ -103,30 +92,39 @@ public class TourneyMasterWindow extends JFrame {
         JPanel scenePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         JComboBox<String> sceneBox = new JComboBox<>();
-        OBSController.getInstance().getSceneList((res) -> {
-            if (res == null) {
-                TourneyMaster.showError("Failed to fetch scenes: response is null.");
-                return;
-            }
 
-            SwingUtilities.invokeLater(() -> {
-                for (Scene scene : res.getScenes()) {
-                    sceneBox.addItem(scene.getSceneName());
+        OBSController.getInstance().onConnectStatusChanged((connected) -> {
+
+            if (!connected) return;
+
+            OBSController.getInstance().getSceneList((res) -> {
+                if (res == null) {
+                    TourneyMaster.showError("Failed to fetch scenes: response is null.");
+                    return;
                 }
-                sceneBox.revalidate();
-                scenePanel.repaint();
+
+                SwingUtilities.invokeLater(() -> {
+                    sceneBox.removeAllItems();
+                    for (Scene scene : res.getScenes()) {
+                        sceneBox.addItem(scene.getSceneName());
+                    }
+                });
             });
         });
 
-
         sceneBox.addActionListener((e) -> {
-            OBSController.getInstance().openScene((String) sceneBox.getSelectedItem());
+            String item = (String) sceneBox.getSelectedItem();
+            if (item == null) {
+                return;
+            }
+            OBSController.getInstance().openScene(item);
         });
 
         scenePanel.add(sceneBox);
 
         return scenePanel;
     }
+
 
     private JPanel createCommentatorConfigPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
@@ -164,18 +162,19 @@ public class TourneyMasterWindow extends JFrame {
         });
         hostSettingsPanel.add(enableCommentatorsCheck);
 
-        JLabel websocketStatusLabel = new JLabel("Not connected");
-        OBSController.getInstance().onConnectStatusChanged((connected) -> {
-            websocketStatusLabel.setText(connected ? "Connected" : "Not connected");
-        });
-
-        ActionButton connectButton = new ActionButton("Reconnect", (e) -> {
+        OBSController obsController = OBSController.getInstance();
+        ActionButton connectButton = new ActionButton(obsController.isConnected() ? "Reconnect (Currently connected)" : "Connect (Not connected)"
+                , (e) -> {
             try {
                 OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
             } catch (Exception err) {
                 err.printStackTrace();
                 TourneyMaster.showError("Failed to connect to OBS WebSocket server: " + err.getMessage());
             }
+        });
+
+        obsController.onConnectStatusChanged((connected) -> {
+            connectButton.setText(connected ? "Reconnect (Currently connected)" : "Connect (Not connected)");
         });
 
         hostSettingsPanel.add(connectButton);
@@ -203,12 +202,6 @@ public class TourneyMasterWindow extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-        hostSettingsPanel.add(websocketStatusLabel, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(connectButton, gbc);

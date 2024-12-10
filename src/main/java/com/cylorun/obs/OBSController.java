@@ -2,35 +2,42 @@ package com.cylorun.obs;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
-import io.obswebsocket.community.client.OBSCommunicator;
 import io.obswebsocket.community.client.OBSRemoteController;
 import io.obswebsocket.community.client.message.response.scenes.GetCurrentProgramSceneResponse;
 import io.obswebsocket.community.client.message.response.scenes.GetSceneListResponse;
 
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class OBSController {
 
     private OBSRemoteController controller;
-    private boolean isConnected = false;
-    private boolean isConnecting = false;
-    private Consumer<Boolean> connectStatusConsumer;
+    private volatile boolean isConnected = false;
+    private volatile boolean isConnecting = false;
+    private final CopyOnWriteArrayList<Consumer<Boolean>> connectStatusConsumers;
     private static OBSController instance;
 
     private OBSController() {
         TourneyMasterOptions options = TourneyMasterOptions.getInstance();
+        this.connectStatusConsumers = new CopyOnWriteArrayList<>();
         this.connect(options.obs_host, options.obs_port, options.obs_password);
     }
 
     private void setIsConnected(boolean b) {
         this.isConnected = b;
-        if (this.connectStatusConsumer != null) {
-            this.connectStatusConsumer.accept(b);
+
+        // Notify all consumers safely
+        for (Consumer<Boolean> consumer : this.connectStatusConsumers) {
+            try {
+                consumer.accept(b);
+            } catch (Exception e) {
+                TourneyMaster.log(Level.SEVERE, "Error in connect status consumer: " + e.getMessage());
+            }
         }
     }
 
-    public synchronized static OBSController getInstance() {
+    public static synchronized OBSController getInstance() {
         if (instance == null) {
             instance = new OBSController();
         }
@@ -41,11 +48,11 @@ public class OBSController {
         this.connect("localhost", port, password);
     }
 
-    public synchronized void connect(String host, int port, String password) {
-        if (this.isConnecting) return;
+    public void connect(String host, int port, String password) {
+        if (isConnecting) return;
 
-        this.isConnecting = true;
-        this.disconnect();
+        isConnecting = true;
+        disconnect();
 
         try {
             final OBSRemoteController[] tempControllerHolder = new OBSRemoteController[1];
@@ -59,20 +66,19 @@ public class OBSController {
                     .onReady(() -> {
                         TourneyMaster.log(Level.INFO, "Connected to OBS");
                         this.controller = tempControllerHolder[0];
-                        this.isConnecting = false;
-                        this.setIsConnected(true);
+                        isConnecting = false;
+                        setIsConnected(true);
                     })
                     .onDisconnect(() -> {
                         TourneyMaster.log(Level.INFO, "Disconnected OBS controller");
-                        this.isConnecting = false;
-                        this.setIsConnected(false);
+                        isConnecting = false;
+                        setIsConnected(false);
                     })
                     .onCommunicatorError((err) -> {
                         TourneyMaster.log(Level.SEVERE, "OBS Communication error: " + err.getReason());
-                        TourneyMaster.showError("OBS Communication error, make sure OBS is running and has websocket server installed and enabled: " + err.getReason());
-                        this.isConnecting = false;
-
-//                        TourneyMaster.stop();
+                        TourneyMaster.showError("OBS Communication error, make sure OBS is running and has websocket server installed and enabled:\n" + err.getReason());
+                        isConnecting = false;
+                        setIsConnected(false);
                     })
                     .and()
                     .build();
@@ -82,18 +88,16 @@ public class OBSController {
             tempController.connect();
         } catch (Exception e) {
             TourneyMaster.log(Level.SEVERE, "Exception during connection: " + e.getMessage());
-            this.isConnecting = false;
+            isConnecting = false;
         }
     }
 
-
-
     public void onConnectStatusChanged(Consumer<Boolean> status) {
-        this.connectStatusConsumer = status;
+        this.connectStatusConsumers.add(status);
     }
 
     public void disconnect() {
-        this.setIsConnected(false);
+        setIsConnected(false);
         if (this.controller != null) {
             this.controller.disconnect();
         }
@@ -104,11 +108,16 @@ public class OBSController {
     }
 
     public void openScene(String name) {
+        if (this.controller == null) {
+            TourneyMaster.log(Level.SEVERE, "Controller not connected, cannot open scene: " + name);
+            return;
+        }
+
         this.controller.setCurrentProgramScene(name, (response) -> {
             if (response != null && response.isSuccessful()) {
-                System.out.println("Scene switched to: " + name);
+                TourneyMaster.log(Level.INFO, "Scene switched to: " + name);
             } else {
-                System.err.println("Failed to switch scene: " +
+                TourneyMaster.log(Level.SEVERE, "Failed to switch scene: " +
                         (response != null ? response.getMessageData().getRequestStatus().getComment() : "Unknown error"));
             }
         });
@@ -119,11 +128,16 @@ public class OBSController {
             consumer.accept(null);
             return;
         }
+
         this.controller.getSceneList(consumer);
     }
 
     public void getCurrentScene(Consumer<GetCurrentProgramSceneResponse> consumer) {
+        if (this.controller == null) {
+            consumer.accept(null);
+            return;
+        }
+
         this.controller.getCurrentProgramScene(consumer);
     }
-
 }
