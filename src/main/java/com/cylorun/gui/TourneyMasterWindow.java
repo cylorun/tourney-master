@@ -11,8 +11,6 @@ import io.obswebsocket.community.client.model.Scene;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class TourneyMasterWindow extends JFrame {
     private static TourneyMasterWindow instance;
@@ -75,9 +73,9 @@ public class TourneyMasterWindow extends JFrame {
         return panel;
     }
 
-    private StreamerPanel createStreamersPanel() {
+    private StreamManager createStreamersPanel() {
         TourneyMasterOptions options = TourneyMasterOptions.getInstance();
-        return new StreamerPanel(options.streamers, options.rows, options.cols);
+        return new StreamManager(options.streamers, options.rows, options.cols);
     }
 
     private JPanel createSwitchViewButton(String buttonText) {
