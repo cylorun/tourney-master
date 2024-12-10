@@ -164,6 +164,11 @@ public class TourneyMasterWindow extends JFrame {
         });
         hostSettingsPanel.add(enableCommentatorsCheck);
 
+        JLabel websocketStatusLabel = new JLabel("Not connected");
+        OBSController.getInstance().onConnectStatusChanged((connected) -> {
+            websocketStatusLabel.setText(connected ? "Connected" : "Not connected");
+        });
+
         ActionButton connectButton = new ActionButton("Reconnect", (e) -> {
             try {
                 OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
@@ -200,6 +205,12 @@ public class TourneyMasterWindow extends JFrame {
         gbc.gridy = 4;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
+        hostSettingsPanel.add(websocketStatusLabel, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(connectButton, gbc);
 
         return hostSettingsPanel;
@@ -230,7 +241,7 @@ public class TourneyMasterWindow extends JFrame {
         }
     }
 
-    public static TourneyMasterWindow getInstance() {
+    public synchronized static TourneyMasterWindow getInstance() {
         if (instance == null) {
             instance = new TourneyMasterWindow();
         }

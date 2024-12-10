@@ -34,6 +34,11 @@ public class TourneyMaster {
 
     public static void showError(String msg) {
         log(Level.SEVERE, msg);
-        JOptionPane.showMessageDialog(TourneyMasterWindow.getInstance(), msg, "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(null, msg, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static void stop() {
+        log(Level.INFO, "Quitting...");
+        System.exit(1);
     }
 }

@@ -1,20 +1,20 @@
 package com.cylorun.obs;
 
+import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
+import io.obswebsocket.community.client.OBSCommunicator;
 import io.obswebsocket.community.client.OBSRemoteController;
-import io.obswebsocket.community.client.message.request.config.GetSceneCollectionListRequest;
-import io.obswebsocket.community.client.message.response.config.GetSceneCollectionListResponse;
 import io.obswebsocket.community.client.message.response.scenes.GetCurrentProgramSceneResponse;
 import io.obswebsocket.community.client.message.response.scenes.GetSceneListResponse;
-import io.obswebsocket.community.client.model.Scene;
 
-import java.util.List;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 public class OBSController {
 
     private OBSRemoteController controller;
     private boolean isConnected = false;
+    private boolean isConnecting = false;
     private Consumer<Boolean> connectStatusConsumer;
     private static OBSController instance;
 
@@ -25,13 +25,12 @@ public class OBSController {
 
     private void setIsConnected(boolean b) {
         this.isConnected = b;
-        System.out.println("Connected: " + b);
         if (this.connectStatusConsumer != null) {
             this.connectStatusConsumer.accept(b);
         }
     }
 
-    public static OBSController getInstance() {
+    public synchronized static OBSController getInstance() {
         if (instance == null) {
             instance = new OBSController();
         }
@@ -42,19 +41,52 @@ public class OBSController {
         this.connect("localhost", port, password);
     }
 
-    public void connect(String host, int port, String password) {
+    public synchronized void connect(String host, int port, String password) {
+        if (this.isConnecting) return;
+
+        this.isConnecting = true;
         this.disconnect();
-        OBSRemoteController controller = OBSRemoteController.builder()
-                .host(host)
-                .port(port)
-                .password(password)
-                .build();
 
-        controller.connect();
-        this.setIsConnected(true);
+        try {
+            final OBSRemoteController[] tempControllerHolder = new OBSRemoteController[1];
 
-        this.controller = controller;
+            OBSRemoteController tempController = OBSRemoteController.builder()
+                    .host(host)
+                    .port(port)
+                    .password(password)
+                    .connectionTimeout(4)
+                    .lifecycle()
+                    .onReady(() -> {
+                        TourneyMaster.log(Level.INFO, "Connected to OBS");
+                        this.controller = tempControllerHolder[0];
+                        this.isConnecting = false;
+                        this.setIsConnected(true);
+                    })
+                    .onDisconnect(() -> {
+                        TourneyMaster.log(Level.INFO, "Disconnected OBS controller");
+                        this.isConnecting = false;
+                        this.setIsConnected(false);
+                    })
+                    .onCommunicatorError((err) -> {
+                        TourneyMaster.log(Level.SEVERE, "OBS Communication error: " + err.getReason());
+                        TourneyMaster.showError("OBS Communication error, make sure OBS is running and has websocket server installed and enabled: " + err.getReason());
+                        this.isConnecting = false;
+
+//                        TourneyMaster.stop();
+                    })
+                    .and()
+                    .build();
+
+            tempControllerHolder[0] = tempController;
+
+            tempController.connect();
+        } catch (Exception e) {
+            TourneyMaster.log(Level.SEVERE, "Exception during connection: " + e.getMessage());
+            this.isConnecting = false;
+        }
     }
+
+
 
     public void onConnectStatusChanged(Consumer<Boolean> status) {
         this.connectStatusConsumer = status;
@@ -83,6 +115,10 @@ public class OBSController {
     }
 
     public void getSceneList(Consumer<GetSceneListResponse> consumer) {
+        if (this.controller == null) {
+            consumer.accept(null);
+            return;
+        }
         this.controller.getSceneList(consumer);
     }
 
