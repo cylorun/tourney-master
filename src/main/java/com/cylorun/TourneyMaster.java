@@ -31,4 +31,9 @@ public class TourneyMaster {
             System.err.printf("[%s/%s] %s%n", "SEVERE", time, s.toString());
         }
     }
+
+    public static void showError(String msg) {
+        log(Level.SEVERE, msg);
+        JOptionPane.showMessageDialog(TourneyMasterWindow.getInstance(), msg, "Error", JOptionPane.ERROR_MESSAGE);
+    }
 }

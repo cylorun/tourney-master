@@ -4,6 +4,7 @@ import com.cylorun.TourneyMasterOptions;
 import io.obswebsocket.community.client.OBSRemoteController;
 import io.obswebsocket.community.client.message.request.config.GetSceneCollectionListRequest;
 import io.obswebsocket.community.client.message.response.config.GetSceneCollectionListResponse;
+import io.obswebsocket.community.client.message.response.scenes.GetCurrentProgramSceneResponse;
 import io.obswebsocket.community.client.message.response.scenes.GetSceneListResponse;
 import io.obswebsocket.community.client.model.Scene;
 
@@ -84,4 +85,9 @@ public class OBSController {
     public void getSceneList(Consumer<GetSceneListResponse> consumer) {
         this.controller.getSceneList(consumer);
     }
+
+    public void getCurrentScene(Consumer<GetCurrentProgramSceneResponse> consumer) {
+        this.controller.getCurrentProgramScene(consumer);
+    }
+
 }

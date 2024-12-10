@@ -102,13 +102,13 @@ public class TourneyMasterWindow extends JFrame {
     private JPanel createSwitchScenePanel() {
         JPanel scenePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-
         JComboBox<String> sceneBox = new JComboBox<>();
         OBSController.getInstance().getSceneList((res) -> {
             if (res == null) {
-                System.err.println("Failed to fetch scenes: response is null.");
+                TourneyMaster.showError("Failed to fetch scenes: response is null.");
                 return;
             }
+
             SwingUtilities.invokeLater(() -> {
                 for (Scene scene : res.getScenes()) {
                     sceneBox.addItem(scene.getSceneName());
@@ -169,7 +169,7 @@ public class TourneyMasterWindow extends JFrame {
                 OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
             } catch (Exception err) {
                 err.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Failed to connect to OBS WebSocket server: " + err.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                TourneyMaster.showError("Failed to connect to OBS WebSocket server: " + err.getMessage());
             }
         });
 
