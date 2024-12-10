@@ -78,7 +78,7 @@ public class TourneyMasterWindow extends JFrame {
         for (int i = 0; i < options.rows * options.cols; i++) {
             JPanel streamerPanel = new JPanel(new BorderLayout());
 
-            JComboBox<String> streamerDropdown = new JComboBox<>(TourneyMasterOptions.getInstance().streamers.toArray(new String[0]));
+            JComboBox<String> streamerDropdown = new JComboBox<>(options.streamers.toArray(new String[0]));
 
             streamerPanel.add(streamerDropdown, BorderLayout.CENTER);
 
