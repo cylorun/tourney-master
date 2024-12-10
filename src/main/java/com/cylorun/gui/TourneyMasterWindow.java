@@ -1,5 +1,6 @@
 package com.cylorun.gui;
 
+import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
 import com.cylorun.gui.components.ActionButton;
 import com.cylorun.gui.components.BooleanOptionField;
@@ -72,8 +73,9 @@ public class TourneyMasterWindow extends JFrame {
 
 
     private JPanel createStreamersPanel() {
+        TourneyMasterOptions options = TourneyMasterOptions.getInstance();
         JPanel streamersPanel = new JPanel(new GridLayout(3, 3, 10, 10));
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < options.rows * options.cols; i++) {
             JPanel streamerPanel = new JPanel(new BorderLayout());
 
             JComboBox<String> streamerDropdown = new JComboBox<>(TourneyMasterOptions.getInstance().streamers.toArray(new String[0]));
