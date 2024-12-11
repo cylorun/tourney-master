@@ -160,6 +160,11 @@ public class TourneyMasterWindow extends JFrame {
         });
         hostSettingsPanel.add(enableCommentatorsCheck);
 
+
+        ActionButton playerButton = new ActionButton("Players", (e) -> {
+            PlayerConfigWindow.getInstance().open();;
+        });
+
         OBSController obsController = OBSController.getInstance();
         ActionButton connectButton = new ActionButton(obsController.isConnected() ? "Reconnect (Currently connected)" : "Connect (Not connected)"
                 , (e) -> {
@@ -200,6 +205,12 @@ public class TourneyMasterWindow extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        hostSettingsPanel.add(playerButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(connectButton, gbc);
