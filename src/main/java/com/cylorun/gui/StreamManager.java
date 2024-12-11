@@ -1,5 +1,7 @@
 package com.cylorun.gui;
 
+import com.cylorun.model.Player;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -10,18 +12,18 @@ import java.util.function.Consumer;
 public class StreamManager extends JPanel {
 
     private List<StreamerPanel> selectedStreamers;
-    private List<String> ttvNames;
-    public StreamManager(List<String> ttvNames, int rows, int cols) {
+    private List<Player> ttvNames;
+    public StreamManager(List<Player> ttvNames, int rows, int cols) {
         super(new GridLayout(rows, cols, 10, 10));
 
         this.ttvNames = ttvNames;
         this.selectedStreamers = new ArrayList<>();
-        String prevName = "";
+        Player prev = new Player("place", "holder");
 
         for (int i = 0; i < rows * cols; i++) {
-            String streamer = ttvNames.size() > i ?  ttvNames.get(i) : prevName;
-            prevName = streamer;
-            StreamerPanel streamerPanel = new StreamerPanel(streamer,this.ttvNames);
+            Player streamer = ttvNames.size() > i ?  ttvNames.get(i) : prev;
+            prev = streamer;
+            StreamerPanel streamerPanel = new StreamerPanel(streamer, this.ttvNames);
             streamerPanel.onCheckBoxChange(() -> {
                 System.out.println("Click: " + streamerPanel.ttvName);
                 this.selectedStreamers.add(streamerPanel);
@@ -41,15 +43,16 @@ public class StreamManager extends JPanel {
     }
 
     public static class StreamerPanel extends JPanel {
-        private String ttvName;
+        private Player ttvName;
         private Runnable onCheckBoxChange;
-        public StreamerPanel(String ttvName, List<String> ttvNames) {
+
+        public StreamerPanel(Player streamer, List<Player> ttvNames) {
             super(new BorderLayout());
-            this.ttvName = ttvName;
+            this.ttvName = streamer;
 
-            JComboBox<String> streamerDropdown = new JComboBox<>(ttvNames.toArray(new String[0]));
+            JComboBox<String> streamerDropdown = new JComboBox<>(ttvNames.stream().map(p -> p.twitch).toArray(String[]::new));
 
-            streamerDropdown.setSelectedItem(ttvName);
+            streamerDropdown.setSelectedItem(streamer);
             this.add(streamerDropdown, BorderLayout.CENTER);
 
             JCheckBox activeCheck = new JCheckBox();

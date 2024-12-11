@@ -1,5 +1,6 @@
 package com.cylorun;
 
+import com.cylorun.model.Player;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -20,7 +21,7 @@ public class TourneyMasterOptions {
     public int rows = 3;
     public int cols = 3;
     public boolean enable_commentators = false;
-    public List<String> streamers = new ArrayList<>();
+    public List<Player> players = new ArrayList<>();
     public String lastView = "commentator"; // commentator | host
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = getTrackerDir().resolve("config.json");

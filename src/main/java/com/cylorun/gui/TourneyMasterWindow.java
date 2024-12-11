@@ -75,7 +75,7 @@ public class TourneyMasterWindow extends JFrame {
 
     private StreamManager createStreamersPanel() {
         TourneyMasterOptions options = TourneyMasterOptions.getInstance();
-        return new StreamManager(options.streamers, options.rows, options.cols);
+        return new StreamManager(options.players, options.rows, options.cols);
     }
 
     private JPanel createSwitchViewButton(String buttonText) {
