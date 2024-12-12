@@ -5,16 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b5a248a7-4c4e-47ec-b4fd-28d7d03a41b2" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.jar" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradlew.bat" beforeDir="false" afterPath="$PROJECT_DIR$/gradlew.bat" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/cylorun/TourneyMasterOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cylorun/TourneyMasterOptions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/cylorun/gui/StreamManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cylorun/gui/StreamManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/cylorun/gui/TourneyMasterWindow.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cylorun/gui/TourneyMasterWindow.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/cylorun/model/Player.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cylorun/model/Player.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +57,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Gradle.tourney-master [:TourneyMaster.main()].executor": "Run",
     "Gradle.tourney-master [:com.cylorun.TourneyMaster.main()].executor": "Run",
     "Gradle.tourney-master [:com.cylorun.gui.PlayerConfigWindow.main()].executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
@@ -70,7 +65,11 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/alfgrimur/Desktop/projects/mcspeedrun.net/mcspeedrun-plugin"
+    "last_opened_file_path": "/home/alfgrimur/Desktop/projects/mcspeedrun.net/mcspeedrun-plugin",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)"
   }
 }]]></component>
   <component name="RunManager">
