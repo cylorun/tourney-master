@@ -30,7 +30,6 @@ dependencies {
 
     implementation 'com.formdev:flatlaf:3.2'
 
-    implementation 'io.obs-websocket.community:client:2.0.0'
     implementation 'com.google.code.gson:gson:2.11.0'
 }
 

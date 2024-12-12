@@ -6,7 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="b5a248a7-4c4e-47ec-b4fd-28d7d03a41b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/cylorun/obs/OBSController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/cylorun/obs/OBSController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,16 +59,19 @@
     "Gradle.tourney-master [:com.cylorun.TourneyMaster.main()].executor": "Run",
     "Gradle.tourney-master [:com.cylorun.gui.PlayerConfigWindow.main()].executor": "Run",
     "Gradle.tourney-master [:tst.main()].executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "obs-script",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "/home/alfgrimur/Desktop/projects/mcspeedrun.net/mcspeedrun-plugin",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)"
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
   <component name="RunManager">
@@ -104,7 +107,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1733526341614</updated>
+      <workItem from="1733968171924" duration="3122000" />
+      <workItem from="1733978603439" duration="715000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
