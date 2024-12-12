@@ -3,6 +3,7 @@ package com.cylorun.obs;
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
 import io.obswebsocket.community.client.OBSRemoteController;
+import io.obswebsocket.community.client.message.request.sceneitems.SetSceneItemTransformRequest;
 import io.obswebsocket.community.client.message.response.scenes.GetCurrentProgramSceneResponse;
 import io.obswebsocket.community.client.message.response.scenes.GetSceneListResponse;
 
@@ -49,10 +50,10 @@ public class OBSController {
     }
 
     public void connect(String host, int port, String password) {
-        if (isConnecting) return;
+        if (this.isConnecting) return;
 
-        isConnecting = true;
-        disconnect();
+        this.isConnecting = true;
+        this.disconnect();
 
         try {
             final OBSRemoteController[] tempControllerHolder = new OBSRemoteController[1];
@@ -66,18 +67,18 @@ public class OBSController {
                     .onReady(() -> {
                         TourneyMaster.log(Level.INFO, "Connected to OBS");
                         this.controller = tempControllerHolder[0];
-                        isConnecting = false;
+                        this.isConnecting = false;
                         setIsConnected(true);
                     })
                     .onDisconnect(() -> {
                         TourneyMaster.log(Level.INFO, "Disconnected OBS controller");
-                        isConnecting = false;
+                        this.isConnecting = false;
                         setIsConnected(false);
                     })
                     .onCommunicatorError((err) -> {
                         TourneyMaster.log(Level.SEVERE, "OBS Communication error: " + err.getReason());
                         TourneyMaster.showError("OBS Communication error, make sure OBS is running and has websocket server installed and enabled:\n" + err.getReason());
-                        isConnecting = false;
+                        this.isConnecting = false;
                         setIsConnected(false);
                     })
                     .and()
@@ -88,7 +89,7 @@ public class OBSController {
             tempController.connect();
         } catch (Exception e) {
             TourneyMaster.log(Level.SEVERE, "Exception during connection: " + e.getMessage());
-            isConnecting = false;
+            this.isConnecting = false;
         }
     }
 
@@ -97,7 +98,7 @@ public class OBSController {
     }
 
     public void disconnect() {
-        setIsConnected(false);
+        this.setIsConnected(false);
         if (this.controller != null) {
             this.controller.disconnect();
         }
