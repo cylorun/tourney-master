@@ -7,6 +7,7 @@
     <list default="true" id="b5a248a7-4c4e-47ec-b4fd-28d7d03a41b2" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/obsscript/TourneyMaster.lua" beforeDir="false" afterPath="$PROJECT_DIR$/obsscript/TourneyMaster.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obsscript/protocol.md" beforeDir="false" afterPath="$PROJECT_DIR$/obsscript/protocol.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +115,7 @@
       <workItem from="1733978603439" duration="1450000" />
       <workItem from="1734013331980" duration="5000" />
       <workItem from="1734016504259" duration="983000" />
-      <workItem from="1734017668606" duration="2711000" />
+      <workItem from="1734017668606" duration="11305000" />
     </task>
     <servers />
   </component>
