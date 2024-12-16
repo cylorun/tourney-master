@@ -95,7 +95,7 @@ public class TourneyMasterWindow extends JFrame {
 
             if (!connected) return;
 
-            OBSController.getInstance().getSceneList((res) -> {
+            OBSController.getInstance().getAllSceneNames((res) -> {
                 if (res == null) {
                     TourneyMaster.showError("Failed to fetch scenes: response is null.");
                     return;

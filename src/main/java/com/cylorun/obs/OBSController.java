@@ -2,23 +2,24 @@ package com.cylorun.obs;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
-import io.obswebsocket.community.client.OBSRemoteController;
-import io.obswebsocket.community.client.message.request.sceneitems.SetSceneItemTransformRequest;
-import io.obswebsocket.community.client.message.response.scenes.GetCurrentProgramSceneResponse;
-import io.obswebsocket.community.client.message.response.scenes.GetSceneListResponse;
 
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class OBSController {
-
-    private boolean isConnected = false;
-    private boolean isConnecting = false;
+    private Stack<Consumer<String>> waitingRequests;
     private static OBSController instance;
 
     private OBSController() {
-        TourneyMasterOptions options = TourneyMasterOptions.getInstance();
+        this.waitingRequests = new Stack<>();
+        OBSOutputFile.getInstance().onOutputChange(this::onOutputChange);
     }
 
 
@@ -29,16 +30,56 @@ public class OBSController {
         return instance;
     }
 
-    public void openScene(String name) {
+    private void writeOBSState(String data) {
+        File obsstate = TourneyMasterOptions.getTrackerDir().resolve("obsstate").toFile();
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(obsstate));
 
+            writer.write(data);
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void getSceneList(Consumer<GetSceneListResponse> consumer) {
-        if (this.controller == null) {
-            consumer.accept(null);
+    private void onOutputChange(String c) {
+        Consumer<String> lastConsumer = this.waitingRequests.pop();
+        if (lastConsumer == null) {
+            TourneyMaster.log(Level.WARNING, "Unexpected output change: " + c);
             return;
         }
 
-        this.controller.getSceneList(consumer);
+        lastConsumer.accept(c);
+    }
+
+    private void sendAndGetOBS(String req, Consumer<String> res) {
+        this.writeOBSState(req);
+
+        this.waitingRequests.push(res);
+
+    }
+
+    private void sendOBS(String req) {
+        this.writeOBSState(req);
+    }
+
+    public void openScene(String name) {
+        this.sendOBS("SetActiveScene:" + name);
+    }
+
+    public void setBrowserSourceURL(String sourceName, String url) {
+        this.sendOBS("SetBrowserSourceURL:" + sourceName + ";" + url);
+    }
+
+    public void getAllSceneNames(Consumer<List<String>> consumer) {
+        this.sendAndGetOBS("GetAllScenes", (out) -> {
+            if (out != null && !out.isEmpty()) {
+                List<String> list = Arrays.stream(out.split(";")).toList();
+                consumer.accept(list);
+            } else {
+                consumer.accept(List.of());
+            }
+        });
     }
 }
