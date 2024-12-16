@@ -6,7 +6,6 @@ import com.cylorun.gui.components.ActionButton;
 import com.cylorun.gui.components.BooleanOptionField;
 import com.cylorun.gui.components.TextOptionField;
 import com.cylorun.obs.OBSController;
-import io.obswebsocket.community.client.model.Scene;
 
 import javax.swing.*;
 import java.awt.*;
@@ -91,22 +90,18 @@ public class TourneyMasterWindow extends JFrame {
 
         JComboBox<String> sceneBox = new JComboBox<>();
 
-        OBSController.getInstance().onConnectStatusChanged((connected) -> {
 
-            if (!connected) return;
+        OBSController.getInstance().getAllSceneNames((res) -> {
+            if (res == null) {
+                TourneyMaster.showError("Failed to fetch scenes: response is null.");
+                return;
+            }
 
-            OBSController.getInstance().getAllSceneNames((res) -> {
-                if (res == null) {
-                    TourneyMaster.showError("Failed to fetch scenes: response is null.");
-                    return;
+            SwingUtilities.invokeLater(() -> {
+                sceneBox.removeAllItems();
+                for (String name : res) {
+                    sceneBox.addItem(name);
                 }
-
-                SwingUtilities.invokeLater(() -> {
-                    sceneBox.removeAllItems();
-                    for (Scene scene : res.getScenes()) {
-                        sceneBox.addItem(scene.getSceneName());
-                    }
-                });
             });
         });
 
@@ -162,25 +157,9 @@ public class TourneyMasterWindow extends JFrame {
 
 
         ActionButton playerButton = new ActionButton("Players", (e) -> {
-            PlayerConfigWindow.getInstance().open();;
+            PlayerConfigWindow.getInstance().open();
+            ;
         });
-
-        OBSController obsController = OBSController.getInstance();
-        ActionButton connectButton = new ActionButton(obsController.isConnected() ? "Reconnect (Currently connected)" : "Connect (Not connected)"
-                , (e) -> {
-            try {
-                OBSController.getInstance().connect(options.obs_host, options.obs_port, options.obs_password);
-            } catch (Exception err) {
-                err.printStackTrace();
-                TourneyMaster.showError("Failed to connect to OBS WebSocket server: " + err.getMessage());
-            }
-        });
-
-        obsController.onConnectStatusChanged((connected) -> {
-            connectButton.setText(connected ? "Reconnect (Currently connected)" : "Connect (Not connected)");
-        });
-
-        hostSettingsPanel.add(connectButton);
 
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -208,12 +187,6 @@ public class TourneyMasterWindow extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(playerButton, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
-        hostSettingsPanel.add(connectButton, gbc);
 
         return hostSettingsPanel;
     }

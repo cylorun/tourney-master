@@ -3,22 +3,27 @@ package com.cylorun.obs;
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.io.*;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
 public class OBSController {
-    private Stack<Consumer<String>> waitingRequests;
+    private final Deque<Consumer<String>> waitingRequests;
     private static OBSController instance;
 
+    public static final File OBS_IN = TourneyMasterOptions.getTrackerDir().resolve("obsstate").toFile();
+    public static final File OBS_OUT = TourneyMasterOptions.getTrackerDir().resolve("obsstate.out").toFile();
+
     private OBSController() {
-        this.waitingRequests = new Stack<>();
+        this.waitingRequests = new ArrayDeque<>();
+        this.writeOBSState("");
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
         OBSOutputFile.getInstance().onOutputChange(this::onOutputChange);
     }
 
@@ -27,41 +32,39 @@ public class OBSController {
         if (instance == null) {
             instance = new OBSController();
         }
+
         return instance;
     }
 
-    private void writeOBSState(String data) {
-        File obsstate = TourneyMasterOptions.getTrackerDir().resolve("obsstate").toFile();
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(obsstate));
-
+    private synchronized void writeOBSState(String data) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(OBS_IN))) {
             writer.write(data);
             writer.flush();
-            writer.close();
         } catch (IOException e) {
+            TourneyMaster.log(Level.SEVERE, "Error writing to OBS state file: " + e.getMessage());
             throw new RuntimeException(e);
         }
     }
 
-    private void onOutputChange(String c) {
-        Consumer<String> lastConsumer = this.waitingRequests.pop();
-        if (lastConsumer == null) {
-            TourneyMaster.log(Level.WARNING, "Unexpected output change: " + c);
+    private synchronized void onOutputChange(String output) {
+        if (this.waitingRequests.isEmpty()) {
+            TourneyMaster.log(Level.WARNING, "Unexpected OBS output: " + output);
             return;
         }
 
-        lastConsumer.accept(c);
+        Consumer<String> consumer = this.waitingRequests.poll();
+        if (consumer != null) {
+            consumer.accept(output);
+        }
     }
 
-    private void sendAndGetOBS(String req, Consumer<String> res) {
-        this.writeOBSState(req);
-
-        this.waitingRequests.push(res);
-
+    private synchronized void sendAndGetOBS(String request, Consumer<String> responseHandler) {
+        this.waitingRequests.offer(responseHandler);
+        this.writeOBSState(request);
     }
 
-    private void sendOBS(String req) {
-        this.writeOBSState(req);
+    private synchronized void sendOBS(String request) {
+        this.writeOBSState(request);
     }
 
     public void openScene(String name) {
@@ -73,12 +76,12 @@ public class OBSController {
     }
 
     public void getAllSceneNames(Consumer<List<String>> consumer) {
-        this.sendAndGetOBS("GetAllScenes", (out) -> {
-            if (out != null && !out.isEmpty()) {
-                List<String> list = Arrays.stream(out.split(";")).toList();
-                consumer.accept(list);
+        this.sendAndGetOBS("GetAllScenes", (output) -> {
+            if (output != null && !output.isEmpty()) {
+                List<String> scenes = Arrays.asList(output.split(";"));
+                consumer.accept(scenes);
             } else {
-                consumer.accept(List.of());
+                consumer.accept(Collections.emptyList());
             }
         });
     }

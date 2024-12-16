@@ -1,49 +1,48 @@
 package com.cylorun.obs;
 
 import com.cylorun.TourneyMaster;
-import com.cylorun.TourneyMasterOptions;
-import com.cylorun.model.Player;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 
-public class OBSOutputFile extends Thread implements Runnable {
-
+public class OBSOutputFile extends Thread {
     private String lastOutput = "";
-    private List<Consumer<String>> onChangeList;
+    private long lastLastModified = 0L;
+    private final List<Consumer<String>> onChangeList;
 
-    private static final File OUT_FILE = TourneyMasterOptions.getTrackerDir().resolve("obsstate.out").toFile();
-    private static final OBSOutputFile INSTANCE = new OBSOutputFile();
+    private static OBSOutputFile instance;
+
     private OBSOutputFile() {
         this.onChangeList = new ArrayList<>();
         this.start();
     }
 
     public static OBSOutputFile getInstance() {
-        return INSTANCE;
+        if (instance == null) {
+             instance = new OBSOutputFile();
+        }
+        return instance;
     }
 
-    private void notifyConsumers() {
-        for (Consumer<String> c : this.onChangeList) {
-            c.accept(this.lastOutput);
+    private synchronized void notifyConsumers() {
+        System.out.println("Change detected: " + this.lastOutput);
+        for (Consumer<String> consumer : this.onChangeList) {
+            consumer.accept(this.lastOutput);
         }
     }
 
-    private String readOutput() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader(OUT_FILE));
-            String out =  reader.readLine();
-            reader.close();
-
-            return out;
+    private synchronized String readOutput() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(OBSController.OBS_OUT))) {
+            String output = reader.readLine();
+            return (output != null) ? output.trim() : null;
         } catch (FileNotFoundException e) {
-            TourneyMaster.log(Level.WARNING, "obs output file not found!");
+            TourneyMaster.log(Level.WARNING, "OBS output file not found!");
             return null;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            TourneyMaster.log(Level.SEVERE, "Error reading OBS output file: " + e.getMessage());
+            return null;
         }
     }
 
@@ -54,14 +53,16 @@ public class OBSOutputFile extends Thread implements Runnable {
     @Override
     public void run() {
         while (true) {
-            String out = this.readOutput();
-            if (out != null && !out.equals(this.lastOutput)) {
-                this.lastOutput = out;
-                this.notifyConsumers();
-            }
-
             try {
-                Thread.sleep(1000);
+                if (OBSController.OBS_OUT.lastModified() != this.lastLastModified) {
+                    String currentOutput = this.readOutput() ;
+                    this.lastLastModified = OBSController.OBS_OUT.lastModified();
+
+                    if (currentOutput == null) continue;
+                    this.lastOutput = currentOutput;
+                    this.notifyConsumers();
+                }
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

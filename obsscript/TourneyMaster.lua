@@ -4,7 +4,7 @@ local obs = obslua
 last_obsstate = ""
 
 -- constants
-REFRESH_RATE_MS = 1000
+REFRESH_RATE_MS = 250
 
 -- util functions
 
@@ -177,8 +177,6 @@ function tick()
         obs.script_log(obs.LOG_ERROR, "Invalid obsstate format. Expected <instruction>:<args> or just <instruction>")
         return
     end
-
-    obs.script_log(obs.LOG_INFO, "args: "..args)
 
     if args then
         args = split(args, ';')
