@@ -14,6 +14,10 @@ SetActiveScene:<name>
 ```
 SetBrowserSourceURL:<source-name>;<url>
 ```
+**Generate player sources from file**
+```
+GenPlayerSources:<scene name>;<ttv file path>
+```
 
 
 ## Responses

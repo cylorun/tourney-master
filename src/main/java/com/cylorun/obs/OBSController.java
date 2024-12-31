@@ -4,6 +4,8 @@ import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -73,6 +75,12 @@ public class OBSController {
 
     public void setBrowserSourceURL(String sourceName, String url) {
         this.sendOBS("SetBrowserSourceURL:" + sourceName + ";" + url);
+    }
+
+    public void genPlayerSources(String sceneName, String playerTTVFilePath)  {
+        if (!Files.exists(Path.of(playerTTVFilePath))) throw new RuntimeException("Player TTV File does not exist");
+
+        this.sendOBS("GenPlayerSources:" + sceneName + ";" + playerTTVFilePath);
     }
 
     public void getAllSceneNames(Consumer<List<String>> consumer) {
