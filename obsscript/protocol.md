@@ -26,6 +26,10 @@ EditPlayerSource:<scene name>;<source number>;<new ttv name>
 ```
 Gets label and broser sources starting with p{source number} and change their properties based on the "new ttv name"
 
+**Swap 2 player sources**
+```
+SwapPlayerSources:<scene name>;<src num 1>;<src num 2>
+```
 
 ## Responses
 - Responses are read from the ``obstate.out`` file

@@ -203,14 +203,12 @@ function edit_player_source(scene_name, num, new_name)
     local browser_name = "p" .. num .. "-ttv"
     local label_name = "p" .. num .. "-label"
 
-    -- Get the scene
     local current_scene = obs.obs_get_scene_by_name(scene_name)
     if not current_scene then
         obs.script_log(obs.LOG_ERROR, "Scene not found: " .. scene_name)
         return
     end
 
-    -- Function to get a source from a scene by name
     local function get_source(scene, source_name)
         local scene_item = obs.obs_scene_find_source(scene, source_name)
         if scene_item then
@@ -219,7 +217,6 @@ function edit_player_source(scene_name, num, new_name)
         return nil
     end
 
-    -- Update the browser source URL
     local browser_source = get_source(current_scene, browser_name)
     if browser_source then
         local settings = obs.obs_source_get_settings(browser_source)
@@ -230,7 +227,6 @@ function edit_player_source(scene_name, num, new_name)
         obs.script_log(obs.LOG_ERROR, "Browser source not found: " .. browser_name)
     end
 
-    -- Update the text source text
     local text_source = get_source(current_scene, label_name)
     if text_source then
         local settings = obs.obs_source_get_settings(text_source)
@@ -244,6 +240,65 @@ function edit_player_source(scene_name, num, new_name)
     obs.obs_scene_release(current_scene)
 end
 
+function swap_player_sources(scene_name, source1num, source2num)
+    local browser_name_1 = "p" .. source1num .. "-ttv"
+    local label_name_1 = "p" .. source1num .. "-label"
+    local browser_name_2 = "p" .. source2num .. "-ttv"
+    local label_name_2 = "p" .. source2num .. "-label"
+
+    local current_scene = obs.obs_get_scene_by_name(scene_name)
+    if not current_scene then
+        obs.script_log(obs.LOG_ERROR, "Scene not found: " .. scene_name)
+        return
+    end
+
+    local function get_source(scene, source_name)
+        local scene_item = obs.obs_scene_find_source(scene, source_name)
+        if scene_item then
+            return obs.obs_sceneitem_get_source(scene_item)
+        end
+        return nil
+    end
+
+    local browser_source_1 = get_source(current_scene, browser_name_1)
+    local label_source_1 = get_source(current_scene, label_name_1)
+
+    local browser_source_2 = get_source(current_scene, browser_name_2)
+    local label_source_2 = get_source(current_scene, label_name_2)
+
+    if not (browser_source_1 and label_source_1 and browser_source_2 and label_source_2) then
+        obs.script_log(obs.LOG_ERROR, "One or more sources not found for players " .. source1num .. " and " .. source2num)
+        obs.obs_scene_release(current_scene)
+        return
+    end
+
+    local browser_settings_1 = obs.obs_source_get_settings(browser_source_1)
+    local browser_settings_2 = obs.obs_source_get_settings(browser_source_2)
+    local label_settings_1 = obs.obs_source_get_settings(label_source_1)
+    local label_settings_2 = obs.obs_source_get_settings(label_source_2)
+
+    local url_1 = obs.obs_data_get_string(browser_settings_1, "url")
+    local url_2 = obs.obs_data_get_string(browser_settings_2, "url")
+    obs.obs_data_set_string(browser_settings_1, "url", url_2)
+    obs.obs_data_set_string(browser_settings_2, "url", url_1)
+    obs.obs_source_update(browser_source_1, browser_settings_1)
+    obs.obs_source_update(browser_source_2, browser_settings_2)
+
+    local text_1 = obs.obs_data_get_string(label_settings_1, "text")
+    local text_2 = obs.obs_data_get_string(label_settings_2, "text")
+    obs.obs_data_set_string(label_settings_1, "text", text_2)
+    obs.obs_data_set_string(label_settings_2, "text", text_1)
+    obs.obs_source_update(label_source_1, label_settings_1)
+    obs.obs_source_update(label_source_2, label_settings_2)
+
+    obs.obs_data_release(browser_settings_1)
+    obs.obs_data_release(browser_settings_2)
+    obs.obs_data_release(label_settings_1)
+    obs.obs_data_release(label_settings_2)
+    obs.obs_scene_release(current_scene)
+
+    obs.script_log(obs.LOG_INFO, "Swapped sources for players " .. source1num .. " and " .. source2num)
+end
 
 
 
@@ -322,6 +377,17 @@ function parse_instr(instruction, args)
         local scene_name, num, ttv_name = args[1], args[2], args[3]
         edit_player_source(scene_name, num, ttv_name)
 
+
+        return true
+    end
+
+    if instruction == "SwapPlayerSources" then
+        if not args or #args ~= 3 then
+            return false, "Invalid arguments"
+        end
+
+        local scene_name, num1, num2 = args[1], args[2], args[3]
+        swap_player_sources(scene_name, num1, num2)
 
         return true
     end
