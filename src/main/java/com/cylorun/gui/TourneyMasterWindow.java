@@ -4,7 +4,9 @@ import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
 import com.cylorun.gui.components.ActionButton;
 import com.cylorun.gui.components.BooleanOptionField;
+import com.cylorun.gui.components.NumberOptionField;
 import com.cylorun.gui.components.TextOptionField;
+import com.cylorun.leaderboard.PacemanLB;
 import com.cylorun.obs.OBSController;
 
 import javax.swing.*;
@@ -141,9 +143,15 @@ public class TourneyMasterWindow extends JFrame {
             TourneyMasterOptions.save();
         });
 
-        TextOptionField pacemanEventid = new TextOptionField("Paceman Event id", options.paceman_eventid, (newVal) -> {
+        TextOptionField pacemanEventId = new TextOptionField("Paceman Event id", options.paceman_eventid, (newVal) -> {
            options.paceman_eventid = newVal;
+           PacemanLB.getInstance().setEventId(newVal);
            TourneyMasterOptions.save();
+        });
+
+        NumberOptionField maxLbEntries = new NumberOptionField("Max LB Entries", options.max_lb_entries, (newVal) -> {
+            options.max_lb_entries = newVal;
+            TourneyMasterOptions.save();
         });
 
         ActionButton playerButton = new ActionButton("Players", (e) -> {
@@ -154,7 +162,7 @@ public class TourneyMasterWindow extends JFrame {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5); // spacing
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -162,11 +170,15 @@ public class TourneyMasterWindow extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy++;
-        hostSettingsPanel.add(pacemanEventid, gbc);
+        hostSettingsPanel.add(enableCommentatorsCheck, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;
-        hostSettingsPanel.add(enableCommentatorsCheck, gbc);
+        hostSettingsPanel.add(pacemanEventId, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        hostSettingsPanel.add(maxLbEntries, gbc);
 
         gbc.gridx = 0;
         gbc.gridy++;

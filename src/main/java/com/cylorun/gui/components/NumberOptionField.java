@@ -5,6 +5,9 @@ import java.awt.*;
 import java.util.function.Consumer;
 
 public class NumberOptionField extends JPanel {
+    public NumberOptionField(String label, Integer value, Consumer<Integer> consumer) {
+        this(label, null, value, consumer);
+    }
     public NumberOptionField(String label, String toolTipText, Integer value, Consumer<Integer> consumer) {
         this.setLayout(new FlowLayout(FlowLayout.CENTER));
 

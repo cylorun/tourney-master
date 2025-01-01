@@ -1,6 +1,7 @@
 package com.cylorun;
 
 import com.cylorun.gui.TourneyMasterWindow;
+import com.cylorun.leaderboard.PacemanLB;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;
@@ -17,6 +18,8 @@ public class TourneyMaster {
         log(Level.INFO, "Running Tourney-Master v" + VERSION);
 
         TourneyMasterWindow.getInstance();
+
+        PacemanLB.getInstance();
     }
 
     public static void log(Level level, Object s) {
@@ -35,6 +38,15 @@ public class TourneyMaster {
     public static void showError(String msg) {
         log(Level.SEVERE, msg);
         JOptionPane.showMessageDialog(null, msg, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    public static String msToString(long ms) {
+        long totalSeconds = ms / 1000;
+        long remainingSeconds = totalSeconds % 3600;
+        long minutes = (totalSeconds / 60) ;
+        long seconds = remainingSeconds % 60;
+
+        return String.format("%02d:%02d", minutes, seconds);
     }
 
     public static void stop() {

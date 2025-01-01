@@ -17,6 +17,7 @@ public class TourneyMasterOptions {
 
     public int rows = 3;
     public int cols = 3;
+    public int max_lb_entries = 12;
     public boolean enable_commentators = false;
     public boolean enable_paceman_lb = false;
     public String paceman_eventid = "";
