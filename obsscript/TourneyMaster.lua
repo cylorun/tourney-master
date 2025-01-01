@@ -159,14 +159,12 @@ function set_scene(name)
 end
 
 function create_player_group(scene_name, group_name)
-    -- Get the scene by name
     local scene_source = obs.obs_get_source_by_name(scene_name)
     if not scene_source then
         obs.script_log(obs.LOG_ERROR, "Scene not found: " .. scene_name)
         return
     end
 
-    -- Get the scene object
     local scene = obs.obs_scene_from_source(scene_source)
     if not scene then
         obs.script_log(obs.LOG_ERROR, "Failed to get scene object")
@@ -174,38 +172,30 @@ function create_player_group(scene_name, group_name)
         return
     end
 
-    -- Create the browser source
     local browser_settings = obs.obs_data_create()
     obs.obs_data_set_string(browser_settings, "url", "https://player.twitch.tv/?channel=cylorun&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=chunked&volume=0.01")
-    --obs.obs_data_set_int(browser_settings, "width", 240)
-    --obs.obs_data_set_int(browser_settings, "height", 135)
+
     local browser_source = obs.obs_source_create("browser_source", group_name .. "-ttv", browser_settings, nil)
     obs.obs_data_release(browser_settings)
 
-    -- Create the text source
     local text_settings = obs.obs_data_create()
     obs.obs_data_set_string(text_settings, "text", "cylorun he/him \n PB: 9:46")
     local text_source = obs.obs_source_create("text_gdiplus", group_name .. "-label", text_settings, nil)
     obs.obs_data_release(text_settings)
 
-    -- Add the browser and text sources directly to the scene
     local scene_item_browser = obs.obs_scene_add(scene, browser_source)
     local scene_item_text = obs.obs_scene_add(scene, text_source)
 
     if scene_item_browser and scene_item_text then
-        -- Optionally log that the sources were added successfully
         obs.script_log(obs.LOG_INFO, "Sources added to scene: " .. group_name)
     else
-        -- Log error if source adding fails
         obs.script_log(obs.LOG_ERROR, "Failed to add sources to scene: " .. group_name)
     end
 
-    -- Release resources
     obs.obs_source_release(browser_source)
     obs.obs_source_release(text_source)
     obs.obs_source_release(scene_source)
 
-    -- Log information
     obs.script_log(obs.LOG_INFO, "Created and added browser and text sources to scene: " .. scene_name)
 end
 
