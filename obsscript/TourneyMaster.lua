@@ -4,7 +4,7 @@ local obs = obslua
 last_obsstate = ""
 
 -- constants
-REFRESH_RATE_MS = 250
+REFRESH_RATE_MS = 100
 
 -- util functions
 
@@ -158,23 +158,74 @@ function set_scene(name)
     end
 end
 
-function tick()
-    local obsstate = get_obsstate()
-    if not obsstate then
-        obs.script_log(obs.LOG_ERROR, "obsstate file not found")
+function create_player_group(scene_name, group_name)
+    -- Get the scene by name
+    local scene_source = obs.obs_get_source_by_name(scene_name)
+    if not scene_source then
+        obs.script_log(obs.LOG_ERROR, "Scene not found: " .. scene_name)
         return
     end
 
-    if last_obsstate == obsstate then
+    -- Get the scene object
+    local scene = obs.obs_scene_from_source(scene_source)
+    if not scene then
+        obs.script_log(obs.LOG_ERROR, "Failed to get scene object")
+        obs.obs_source_release(scene_source)
+        return
+    end
+
+    -- Create the browser source
+    local browser_settings = obs.obs_data_create()
+    obs.obs_data_set_string(browser_settings, "url", "https://player.twitch.tv/?channel=cylorun&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=chunked&volume=0.01")
+    --obs.obs_data_set_int(browser_settings, "width", 240)
+    --obs.obs_data_set_int(browser_settings, "height", 135)
+    local browser_source = obs.obs_source_create("browser_source", group_name .. "-ttv", browser_settings, nil)
+    obs.obs_data_release(browser_settings)
+
+    -- Create the text source
+    local text_settings = obs.obs_data_create()
+    obs.obs_data_set_string(text_settings, "text", "cylorun he/him \n PB: 9:46")
+    local text_source = obs.obs_source_create("text_gdiplus", group_name .. "-label", text_settings, nil)
+    obs.obs_data_release(text_settings)
+
+    -- Add the browser and text sources directly to the scene
+    local scene_item_browser = obs.obs_scene_add(scene, browser_source)
+    local scene_item_text = obs.obs_scene_add(scene, text_source)
+
+    if scene_item_browser and scene_item_text then
+        -- Optionally log that the sources were added successfully
+        obs.script_log(obs.LOG_INFO, "Sources added to scene: " .. group_name)
+    else
+        -- Log error if source adding fails
+        obs.script_log(obs.LOG_ERROR, "Failed to add sources to scene: " .. group_name)
+    end
+
+    -- Release resources
+    obs.obs_source_release(browser_source)
+    obs.obs_source_release(text_source)
+    obs.obs_source_release(scene_source)
+
+    -- Log information
+    obs.script_log(obs.LOG_INFO, "Created and added browser and text sources to scene: " .. scene_name)
+end
+
+
+
+
+
+function tick()
+    local obsstate = get_obsstate()
+    if obsstate == nil or obsstate == "" or last_obsstate == obsstate then
         return
     end
 
     last_obsstate = obsstate
 
     local instruction, args = string.match(obsstate, "([^:]+):?(.*)")
-
+    obs.script_log(obs.LOG_INFO, "ACCEPTED STATE: " .. obsstate)
     if not instruction then
         obs.script_log(obs.LOG_ERROR, "Invalid obsstate format. Expected <instruction>:<args> or just <instruction>")
+        obs.script_log(obs.LOG_ERROR, "OBSSTATE^^^" .. obsstate)
         return
     end
 
@@ -184,22 +235,13 @@ function tick()
         args = {}
     end
 
-    if string_starts_with(instruction, "Get") then
-        local success, message = parse_get_instr(instruction, args)
-        if not success then
-            obs.script_log(obs.LOG_ERROR, message)
-        end
-    elseif string_starts_with(instruction, "Set") then
-        local success, message = parse_set_instr(instruction, args)
-        if not success then
-            obs.script_log(obs.LOG_ERROR, message)
-        end
-    else
-       obs.script_log(obs.LOG_ERROR, "Unknown instuction: " .. instruction)
+    local success, message = parse_instr(instruction, args)
+    if not success then
+        obs.script_log(obs.LOG_ERROR, message)
     end
 end
 
-function parse_get_instr(instruction, args)
+function parse_instr(instruction, args)
     if instruction == "GetAllScenes" then
         local scenes_list = get_all_scene_names()
         local scenes_str = ""
@@ -212,9 +254,7 @@ function parse_get_instr(instruction, args)
 
         return true
     end
-end
 
-function parse_set_instr(instruction, args)
     if instruction == "SetActiveScene" then
         if not args or #args == 0 then
             return false, "Missing arguments"
@@ -222,6 +262,20 @@ function parse_set_instr(instruction, args)
 
         local scene_name = args[1]
         set_scene(scene_name)
+        return true
+    end
+
+    if instruction == "GenPlayerSources" then
+        if not args or #args ~= 2 then
+            return false, "Invalid arguments"
+        end
+
+        local scene_name, count = args[1], args[2]
+
+        for i = 1, count do
+            create_player_group(scene_name, "p" .. i)
+        end
+
         return true
     end
 
@@ -243,6 +297,8 @@ end
 
 function script_load(settings)
     obs.script_log(obs.LOG_INFO, "Tourney Master loaded")
+    --last_obsstate = get_obsstate()
+    --obs.script_log(obs.LOG_INFO, last_obsstate)
 
     obs.timer_add(tick, REFRESH_RATE_MS)
 end

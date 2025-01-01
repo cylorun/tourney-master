@@ -26,7 +26,7 @@ public class OBSController {
             throw new RuntimeException(e);
         }
 
-        OBSOutputFile.getInstance().onOutputChange(this::onOutputChange);
+//        OBSOutputFile.getInstance().onOutputChange(this::onOutputChange);
     }
 
 
@@ -77,20 +77,19 @@ public class OBSController {
         this.sendOBS("SetBrowserSourceURL:" + sourceName + ";" + url);
     }
 
-    public void genPlayerSources(String sceneName, String playerTTVFilePath)  {
-        if (!Files.exists(Path.of(playerTTVFilePath))) throw new RuntimeException("Player TTV File does not exist");
-
-        this.sendOBS("GenPlayerSources:" + sceneName + ";" + playerTTVFilePath);
+    public void genPlayerSources(String sceneName, int count)  {
+        this.sendOBS("GenPlayerSources:" + sceneName + ";" + count);
     }
 
     public void getAllSceneNames(Consumer<List<String>> consumer) {
-        this.sendAndGetOBS("GetAllScenes", (output) -> {
-            if (output != null && !output.isEmpty()) {
-                List<String> scenes = Arrays.asList(output.split(";"));
-                consumer.accept(scenes);
-            } else {
-                consumer.accept(Collections.emptyList());
-            }
-        });
+       consumer.accept(List.of("Main", "Everyone", "Intermission")); // will implement proper responses at some point
+//        this.sendAndGetOBS("GetAllScenes", (output) -> {
+//            if (output != null && !output.isEmpty()) {
+//                List<String> scenes = Arrays.asList(output.split(";"));
+//                consumer.accept(scenes);
+//            } else {
+//                consumer.accept(Collections.emptyList());
+//            }
+//        })
     }
 }

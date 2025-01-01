@@ -15,8 +15,11 @@ SetActiveScene:<name>
 SetBrowserSourceURL:<source-name>;<url>
 ```
 **Generate player sources from file**
+
+Generates *count* ammount of groups named in the format p{i}, 
+each group containing a browser source (p{i}-ttv) and a label (p{i}-label)
 ```
-GenPlayerSources:<scene name>;<ttv file path>
+GenPlayerSources:<scene name>;<count>
 ```
 
 
