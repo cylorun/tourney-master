@@ -14,13 +14,17 @@ SetActiveScene:<name>
 ```
 SetBrowserSourceURL:<source-name>;<url>
 ```
-**Generate player sources from file**
+**Generate player sources**
 
-Generates *count* ammount of groups named in the format p{i}, 
-each group containing a browser source (p{i}-ttv) and a label (p{i}-label)
+Generates *count* ammount of browser and text source pairs named p{i}-ttv and p{i}-label
 ```
 GenPlayerSources:<scene name>;<count>
 ```
+**Change player source to diff streamer**
+```
+EditPlayerSource:<scene name>;<source number>;<new ttv name>
+```
+Gets label and broser sources starting with p{source number} and change their properties based on the "new ttv name"
 
 
 ## Responses

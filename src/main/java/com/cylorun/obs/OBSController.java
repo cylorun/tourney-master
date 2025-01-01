@@ -81,6 +81,14 @@ public class OBSController {
         this.sendOBS("GenPlayerSources:" + sceneName + ";" + count);
     }
 
+    public void editPlayerSource(int num, String newttv) {
+        this.editPlayerSource("Main", num, newttv);
+    }
+
+    public void editPlayerSource(String sceneName, int num, String newttv) {
+        this.sendOBS(String.format("EditPlayerSource:%s;%s;%s", sceneName, num, newttv));
+    }
+
     public void getAllSceneNames(Consumer<List<String>> consumer) {
        consumer.accept(List.of("Main", "Everyone", "Intermission")); // will implement proper responses at some point
 //        this.sendAndGetOBS("GetAllScenes", (output) -> {

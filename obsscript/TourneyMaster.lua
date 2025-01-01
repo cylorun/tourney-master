@@ -173,7 +173,7 @@ function create_player_group(scene_name, group_name)
     end
 
     local browser_settings = obs.obs_data_create()
-    obs.obs_data_set_string(browser_settings, "url", "https://player.twitch.tv/?channel=cylorun&enableExtensions=true&muted=true&parent=twitch.tv&player=popout&quality=chunked&volume=0.01")
+    obs.obs_data_set_string(browser_settings, "url", "https://player.twitch.tv/?channel=cylorun&enableExtensions=false&muted=true&parent=twitch.tv&player=popout&quality=chunked&volume=0.01")
 
     local browser_source = obs.obs_source_create("browser_source", group_name .. "-ttv", browser_settings, nil)
     obs.obs_data_release(browser_settings)
@@ -197,6 +197,51 @@ function create_player_group(scene_name, group_name)
     obs.obs_source_release(scene_source)
 
     obs.script_log(obs.LOG_INFO, "Created and added browser and text sources to scene: " .. scene_name)
+end
+
+function edit_player_source(scene_name, num, new_name)
+    local browser_name = "p" .. num .. "-ttv"
+    local label_name = "p" .. num .. "-label"
+
+    -- Get the scene
+    local current_scene = obs.obs_get_scene_by_name(scene_name)
+    if not current_scene then
+        obs.script_log(obs.LOG_ERROR, "Scene not found: " .. scene_name)
+        return
+    end
+
+    -- Function to get a source from a scene by name
+    local function get_source(scene, source_name)
+        local scene_item = obs.obs_scene_find_source(scene, source_name)
+        if scene_item then
+            return obs.obs_sceneitem_get_source(scene_item)
+        end
+        return nil
+    end
+
+    -- Update the browser source URL
+    local browser_source = get_source(current_scene, browser_name)
+    if browser_source then
+        local settings = obs.obs_source_get_settings(browser_source)
+        obs.obs_data_set_string(settings, "url", "https://player.twitch.tv/?channel=" .. new_name .. "&enableExtensions=false&muted=true&parent=twitch.tv&player=popout&quality=chunked&volume=0.01")
+        obs.obs_source_update(browser_source, settings)
+        obs.obs_data_release(settings)
+    else
+        obs.script_log(obs.LOG_ERROR, "Browser source not found: " .. browser_name)
+    end
+
+    -- Update the text source text
+    local text_source = get_source(current_scene, label_name)
+    if text_source then
+        local settings = obs.obs_source_get_settings(text_source)
+        obs.obs_data_set_string(settings, "text", new_name)
+        obs.obs_source_update(text_source, settings)
+        obs.obs_data_release(settings)
+    else
+        obs.script_log(obs.LOG_ERROR, "Text source not found: " .. label_name)
+    end
+
+    obs.obs_scene_release(current_scene)
 end
 
 
@@ -265,6 +310,18 @@ function parse_instr(instruction, args)
         for i = 1, count do
             create_player_group(scene_name, "p" .. i)
         end
+
+        return true
+    end
+
+    if instruction == "EditPlayerSource" then
+        if not args or #args ~= 3 then
+            return false, "Invalid arguments"
+        end
+
+        local scene_name, num, ttv_name = args[1], args[2], args[3]
+        edit_player_source(scene_name, num, ttv_name)
+
 
         return true
     end
