@@ -129,36 +129,26 @@ public class TourneyMasterWindow extends JFrame {
         TourneyMasterOptions options = TourneyMasterOptions.getInstance();
         JPanel hostSettingsPanel = new JPanel(new GridBagLayout());
 
-        hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("Connection Settings"));
-
-        TextOptionField hostField = new TextOptionField("WebSocket Hostname: ", options.obs_host, (newVal) -> {
-            options.obs_host = newVal;
-            TourneyMasterOptions.save();
-        });
-        hostSettingsPanel.add(hostField);
-
-        TextOptionField portField = new TextOptionField("WebSocket Port: ", String.valueOf(options.obs_port), (newVal) -> {
-            options.obs_port = Integer.parseInt(newVal);
-            TourneyMasterOptions.save();
-        }).numbersOnly();
-        hostSettingsPanel.add(portField);
-
-        TextOptionField passwordField = new TextOptionField("WebSocket Password: ", options.obs_password, true, (newVal) -> {
-            options.obs_password = newVal;
-            TourneyMasterOptions.save();
-        });
-        hostSettingsPanel.add(passwordField);
+        hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("General Settings"));
 
         BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators", options.enable_commentators, (newVal) -> {
             options.enable_commentators = newVal;
             TourneyMasterOptions.save();
         });
-        hostSettingsPanel.add(enableCommentatorsCheck);
 
+        BooleanOptionField enablePacemanLb = new BooleanOptionField("Enable Paceman LB", options.enable_paceman_lb, (newVal) -> {
+            options.enable_paceman_lb = newVal;
+            TourneyMasterOptions.save();
+        });
+
+        TextOptionField pacemanEventid = new TextOptionField("Paceman Event id", options.paceman_eventid, (newVal) -> {
+           options.paceman_eventid = newVal;
+           TourneyMasterOptions.save();
+        });
 
         ActionButton playerButton = new ActionButton("Players", (e) -> {
             PlayerConfigWindow.getInstance().open();
-            ;
+
         });
 
 
@@ -168,22 +158,18 @@ public class TourneyMasterWindow extends JFrame {
 
         gbc.gridx = 0;
         gbc.gridy = 0;
-        hostSettingsPanel.add(hostField, gbc);
+        hostSettingsPanel.add(enablePacemanLb, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 1;
-        hostSettingsPanel.add(portField, gbc);
+        gbc.gridy++;
+        hostSettingsPanel.add(pacemanEventid, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 2;
-        hostSettingsPanel.add(passwordField, gbc);
-
-        gbc.gridx = 0;
-        gbc.gridy = 3;
+        gbc.gridy++;
         hostSettingsPanel.add(enableCommentatorsCheck, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 4;
+        gbc.gridy++;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(playerButton, gbc);

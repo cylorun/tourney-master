@@ -15,12 +15,11 @@ import java.util.logging.Level;
 
 public class TourneyMasterOptions {
 
-    public int obs_port = 4455;
-    public String obs_password = "";
-    public String obs_host = "localhost";
     public int rows = 3;
     public int cols = 3;
     public boolean enable_commentators = false;
+    public boolean enable_paceman_lb = false;
+    public String paceman_eventid = "";
     public List<Player> players = new ArrayList<>();
     public String lastView = "commentator"; // commentator | host
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
