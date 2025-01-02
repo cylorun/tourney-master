@@ -20,7 +20,7 @@ public class EventPaceWindow extends JFrame {
         this.initUI();
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() ->
-                SwingUtilities.invokeLater(this::reloadRuns), 0L, 15L, TimeUnit.SECONDS);
+                SwingUtilities.invokeLater(this::reloadRuns), 0L, 10L, TimeUnit.SECONDS);
     }
 
     private void initUI() {
