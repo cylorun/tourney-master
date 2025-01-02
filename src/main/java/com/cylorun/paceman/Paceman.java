@@ -1,6 +1,7 @@
 package com.cylorun.paceman;
 
 import com.cylorun.TourneyMaster;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -11,7 +12,9 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.logging.Level;
 
@@ -65,6 +68,32 @@ public class Paceman {
         return event.map(jsonObject -> jsonObject.get("whitelist").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()).orElseGet(List::of);
     }
 
+    public static Pace getLastEventPace(JsonObject runObj) {
+        JsonElement ttv = runObj.getAsJsonObject("user").get("liveAccount");
+        if (ttv == null ||ttv.isJsonNull()) {
+            return null;
+        }
+
+        JsonArray list = runObj.getAsJsonArray("eventList");
+        JsonObject lastEvent = list.get(list.size() - 1).getAsJsonObject();
+
+        return new Pace(ttv.getAsString(), lastEvent.get("eventId").getAsString(), lastEvent.get("igt").getAsLong());
+    }
+
+    public static String getSplitDesc(String split) {
+        Map<String, String> paceDescriptions = new HashMap<>();
+        paceDescriptions.put("rsg.enter_nether", "The Nether");
+        paceDescriptions.put("rsg.enter_bastion", "Bastion");
+        paceDescriptions.put("rsg.enter_fortress", "Fortress");
+        paceDescriptions.put("rsg.first_portal", "First Portal");
+        paceDescriptions.put("rsg.second_portal", "Second Portal");
+        paceDescriptions.put("rsg.enter_stronghold", "Stronghold");
+        paceDescriptions.put("rsg.enter_end", "The End");
+        paceDescriptions.put("rsg.credits", "Finish!");
+        return paceDescriptions.get(split);
+    }
+
+
     public static List<JsonObject> getPaceForEvent(String eventId) {
         HttpClient client = HttpClient.newHttpClient();
 
@@ -95,6 +124,23 @@ public class Paceman {
 
 
     public static class Pace {
+        public String runner;
+        public String split;
+        public long lastTime;
 
+        public Pace(String runner, String split, long lastTime) {
+            this.runner = runner;
+            this.split = Paceman.getSplitDesc(split);
+            this.lastTime = lastTime;
+        }
+
+        @Override
+        public String toString() {
+            return "Pace{" +
+                    "runner='" + runner + '\'' +
+                    ", split='" + split + '\'' +
+                    ", lastTime=" + lastTime +
+                    '}';
+        }
     }
 }

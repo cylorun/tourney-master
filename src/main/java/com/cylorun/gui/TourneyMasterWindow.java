@@ -156,8 +156,13 @@ public class TourneyMasterWindow extends JFrame {
 
         ActionButton playerButton = new ActionButton("Players", (e) -> {
             PlayerConfigWindow.getInstance().open();
-
         });
+
+        ActionButton paceButton = new ActionButton("Show Pace", (e) -> {
+            EventPaceWindow.getInstance().open();
+        });
+
+
 
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -185,6 +190,12 @@ public class TourneyMasterWindow extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(playerButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        hostSettingsPanel.add(paceButton, gbc);
 
         return hostSettingsPanel;
     }
