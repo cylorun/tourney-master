@@ -1,7 +1,7 @@
 package com.cylorun;
 
 import com.cylorun.gui.TourneyMasterWindow;
-import com.cylorun.leaderboard.PacemanLB;
+import com.cylorun.paceman.PacemanLB;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;

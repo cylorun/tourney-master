@@ -6,7 +6,7 @@ import com.cylorun.gui.components.ActionButton;
 import com.cylorun.gui.components.BooleanOptionField;
 import com.cylorun.gui.components.NumberOptionField;
 import com.cylorun.gui.components.TextOptionField;
-import com.cylorun.leaderboard.PacemanLB;
+import com.cylorun.paceman.PacemanLB;
 import com.cylorun.obs.OBSController;
 
 import javax.swing.*;

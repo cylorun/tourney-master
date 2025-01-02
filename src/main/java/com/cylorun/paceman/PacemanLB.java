@@ -1,4 +1,4 @@
-package com.cylorun.leaderboard;
+package com.cylorun.paceman;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
@@ -10,15 +10,12 @@ import com.google.gson.JsonParser;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -75,7 +72,7 @@ public class PacemanLB  implements Runnable {
             }
 
             JsonArray completions = JsonParser.parseString(response.body()).getAsJsonArray();
-            for (int i = 0; i < completions.size() && i <= TourneyMasterOptions.getInstance().max_lb_entries; i++) {
+            for (int i = 0; i < completions.size() && i < TourneyMasterOptions.getInstance().max_lb_entries; i++) {
                 JsonElement e = completions.get(i);
 
                 JsonObject completion = e.getAsJsonObject();
