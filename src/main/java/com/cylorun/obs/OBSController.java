@@ -6,7 +6,6 @@ import com.cylorun.TourneyMasterOptions;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -116,22 +115,12 @@ public class OBSController {
     public void editPlayerSource(String sceneName, int num, String newttv) {
         this.sendOBS(String.format("EditPlayerSource:%s;%s;%s", sceneName, num, newttv));
     }
-    public void swapSources( int src1, int src2) {
-        this.swapSources("Main", src1, src2);
-    }
-    public void swapSources(String sceneName, int src1, int src2) {
-        this.sendOBS(String.format("SwapPlayerSources:%s;%s;%s", sceneName, src1, src2));
+
+    public void swapPlayerSources(int src1, int src2) {
+        this.swapPlayerSources("Main", src1, src2);
     }
 
-    public void getAllSceneNames(Consumer<List<String>> consumer) {
-       consumer.accept(List.of("Main", "Everyone", "Intermission")); // will implement proper responses at some point
-//        this.sendAndGetOBS("GetAllScenes", (output) -> {
-//            if (output != null && !output.isEmpty()) {
-//                List<String> scenes = Arrays.asList(output.split(";"));
-//                consumer.accept(scenes);
-//            } else {
-//                consumer.accept(Collections.emptyList());
-//            }
-//        })
+    public void swapPlayerSources(String sceneName, int src1, int src2) {
+        this.sendOBS(String.format("SwapPlayerSources:%s;%s;%s", sceneName, src1, src2));
     }
 }

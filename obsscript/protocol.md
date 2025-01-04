@@ -30,17 +30,3 @@ Gets label and broser sources starting with p{source number} and change their pr
 ```
 SwapPlayerSources:<scene name>;<src num 1>;<src num 2>
 ```
-
-## Responses
-- Responses are read from the ``obstate.out`` file
-
-**Get all scenes**
-```
-GetAllScenes
-```
-
-Returns:
-
-```
-<scene1>;<scene2>;<scene3>
-```

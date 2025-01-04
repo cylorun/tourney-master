@@ -52,7 +52,7 @@ public class StreamManager extends JPanel {
         a.updateDropdownSelection();
         b.updateDropdownSelection();
 
-        OBSController.getInstance().swapSources(a.getIdx(), b.getIdx());
+        OBSController.getInstance().swapPlayerSources(a.getIdx(), b.getIdx());
     }
 
     public static class StreamerPanel extends JPanel {
