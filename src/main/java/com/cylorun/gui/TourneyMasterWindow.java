@@ -173,6 +173,10 @@ public class TourneyMasterWindow extends JFrame {
             }
         });
 
+        ActionButton genPlayerSources = new ActionButton("Create Player Sources", (e) -> {
+            this.createPlayerSources();
+        });
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -199,19 +203,38 @@ public class TourneyMasterWindow extends JFrame {
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(playerButton, gbc);
 
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        hostSettingsPanel.add(genPlayerSources, gbc);
+
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(paceButton, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridx = 1;
+//        gbc.gridy++;
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(openConfigFolder, gbc);
 
+
         return hostSettingsPanel;
+    }
+
+    private void createPlayerSources() {
+        if (JOptionPane.showConfirmDialog(this, "Are you sure you want to create player sources?\nThis will mess up the previous sources", "Confirmation", JOptionPane.YES_NO_OPTION)
+                == JOptionPane.YES_OPTION) {
+            String ans = JOptionPane.showInputDialog(this, "Generate sources for how many players", 6);
+            try {
+                int count = Integer.parseInt(ans);
+                OBSController.getInstance().genPlayerSources("Main", count);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Value must be a whole number", "Invalid input", JOptionPane.WARNING_MESSAGE);
+            }
+        }
     }
 
     private void switchView(ActionEvent event) {
