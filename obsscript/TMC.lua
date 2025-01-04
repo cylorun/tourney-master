@@ -29,6 +29,18 @@ function get_obsstate_path()
     return resolve_path(resolve_path(home, ".tourneymaster"), "obsstate")
 end
 
+function isWindows()
+    return package.config:sub(1, 1) == "\\"
+end
+
+function get_textsource_type()
+    if isWindows() then
+        return "text_gdiplus"
+    end
+
+    return "text_ft2_source"
+end
+
 function get_obsstate_out_path()
     return get_obsstate_path() .. ".out"
 end
@@ -180,7 +192,7 @@ function create_player_group(scene_name, group_name)
 
     local text_settings = obs.obs_data_create()
     obs.obs_data_set_string(text_settings, "text", "cylorun he/him \n PB: 9:46")
-    local text_source = obs.obs_source_create("text_gdiplus", group_name .. "-label", text_settings, nil)
+    local text_source = obs.obs_source_create(get_textsource_type(), group_name .. "-label", text_settings, nil)
     obs.obs_data_release(text_settings)
 
     local scene_item_browser = obs.obs_scene_add(scene, browser_source)

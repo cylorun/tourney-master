@@ -44,6 +44,12 @@ public class OBSController {
 
     public static void downloadObsScript(Path downloadDir) {
         try {
+            if (TourneyMaster.VERSION.equals("DEV")) {
+                Files.copy(Path.of("obsscript", "TMC.lua"), downloadDir.resolve("TMC.lua"), StandardCopyOption.REPLACE_EXISTING);
+
+                TourneyMaster.log(Level.INFO, "Moved OBS Script");
+                return;
+            }
             Files.copy(OBS_SCRIPT_DOWNLOAD_URL.openStream(), downloadDir.resolve("TMC.lua"), StandardCopyOption.REPLACE_EXISTING);
             TourneyMaster.log(Level.INFO, "Downloaded OBS Script");
         } catch (IOException e) {
