@@ -22,7 +22,7 @@ public class TourneyMasterOptions {
     public boolean enable_paceman_lb = false;
     public String paceman_eventid = "";
     public List<Player> players = new ArrayList<>();
-    public String lastView = "commentator"; // commentator | host
+    public String lastView = "host"; // commentator | host
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path CONFIG_PATH = getTrackerDir().resolve("config.json");
     private static TourneyMasterOptions instance;

@@ -114,7 +114,7 @@ public class Paceman {
                     .asList()
                     .stream()
                     .map(JsonElement::getAsJsonObject)
-                    .filter(run -> players.contains(run.getAsJsonObject("user").get("uuid").getAsString().replace("-", "")))
+                    .filter(run -> players.contains(run.getAsJsonObject("user").get("uuid").getAsString()))
                     .toList();
 
         } catch (IOException | InterruptedException | NullPointerException e) {
