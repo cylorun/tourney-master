@@ -312,7 +312,16 @@ function swap_player_sources(scene_name, source1num, source2num)
     obs.script_log(obs.LOG_INFO, "Swapped sources for players " .. source1num .. " and " .. source2num)
 end
 
+function create_default_scenes()
+    if not scene_exists("Main") then
+        create_scene("Main")
+    end
+    if not scene_exists("Intermission") then
+        create_scene("Intermission")
+    end
 
+    obs.script_log(obs.LOG_INFO, "Created default scenes")
+end
 
 
 function tick()
@@ -424,7 +433,7 @@ function script_load(settings)
     obs.script_log(obs.LOG_INFO, "Tourney Master loaded")
     --last_obsstate = get_obsstate()
     --obs.script_log(obs.LOG_INFO, last_obsstate)
-
+    create_default_scenes()
     obs.timer_add(tick, REFRESH_RATE_MS)
 end
 
