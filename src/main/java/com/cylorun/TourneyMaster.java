@@ -1,6 +1,7 @@
 package com.cylorun;
 
 import com.cylorun.gui.TourneyMasterWindow;
+import com.cylorun.obs.OBSController;
 import com.cylorun.paceman.PacemanLB;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
@@ -20,6 +21,10 @@ public class TourneyMaster {
         TourneyMasterWindow.getInstance();
 
         PacemanLB.getInstance();
+
+        new Thread(() -> {
+            OBSController.downloadObsScript(TourneyMasterOptions.getTrackerDir());
+        }, "DownloadController").start();
     }
 
     public static void log(Level level, Object s) {

@@ -4,8 +4,12 @@ import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.logging.Level;
@@ -16,6 +20,15 @@ public class OBSController {
 
     public static final File OBS_IN = TourneyMasterOptions.getTrackerDir().resolve("obsstate").toFile();
     public static final File OBS_OUT = TourneyMasterOptions.getTrackerDir().resolve("obsstate.out").toFile();
+    public static final URL OBS_SCRIPT_DOWNLOAD_URL;
+
+    static {
+        try {
+            OBS_SCRIPT_DOWNLOAD_URL = new URL("https://raw.githubusercontent.com/cylorun/tourney-master/refs/heads/main/obsscript/TMC.lua");
+        } catch (MalformedURLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private OBSController() {
         this.waitingRequests = new ArrayDeque<>();
@@ -27,6 +40,15 @@ public class OBSController {
         }
 
 //        OBSOutputFile.getInstance().onOutputChange(this::onOutputChange);
+    }
+
+    public static void downloadObsScript(Path downloadDir) {
+        try {
+            Files.copy(OBS_SCRIPT_DOWNLOAD_URL.openStream(), downloadDir.resolve("TMC.lua"), StandardCopyOption.REPLACE_EXISTING);
+            TourneyMaster.log(Level.INFO, "Downloaded OBS Script");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

@@ -12,6 +12,8 @@ import com.cylorun.obs.OBSController;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.IOException;
+import java.util.logging.Level;
 
 public class TourneyMasterWindow extends JFrame {
     private static TourneyMasterWindow instance;
@@ -162,8 +164,14 @@ public class TourneyMasterWindow extends JFrame {
             EventPaceWindow.getInstance().open();
         });
 
-
-
+        ActionButton openConfigFolder = new ActionButton("Open Config Folder", (e) -> {
+            try {
+                Desktop.getDesktop().open(TourneyMasterOptions.getTrackerDir().toFile());
+            } catch (IOException ex) {
+                TourneyMaster.log(Level.SEVERE, "Failed to open config folder ;?");
+                throw new RuntimeException(ex);
+            }
+        });
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -196,6 +204,12 @@ public class TourneyMasterWindow extends JFrame {
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(paceButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy++;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        hostSettingsPanel.add(openConfigFolder, gbc);
 
         return hostSettingsPanel;
     }
