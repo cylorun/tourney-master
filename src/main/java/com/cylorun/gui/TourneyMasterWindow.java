@@ -13,6 +13,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 
 public class TourneyMasterWindow extends JFrame {
@@ -93,20 +94,11 @@ public class TourneyMasterWindow extends JFrame {
         JPanel scenePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
         JComboBox<String> sceneBox = new JComboBox<>();
-
-
-        OBSController.getInstance().getAllSceneNames((res) -> {
-            if (res == null) {
-                TourneyMaster.showError("Failed to fetch scenes: response is null.");
-                return;
+        SwingUtilities.invokeLater(() -> {
+            sceneBox.removeAllItems();
+            for (String name : List.of("Main","Intermission")) {
+                sceneBox.addItem(name);
             }
-
-            SwingUtilities.invokeLater(() -> {
-                sceneBox.removeAllItems();
-                for (String name : res) {
-                    sceneBox.addItem(name);
-                }
-            });
         });
 
         sceneBox.addActionListener((e) -> {
