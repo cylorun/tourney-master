@@ -1,6 +1,7 @@
 package com.cylorun.paceman;
 
 import com.cylorun.TourneyMaster;
+import com.cylorun.model.Pace;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -119,28 +120,6 @@ public class Paceman {
 
         } catch (IOException | InterruptedException | NullPointerException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-
-    public static class Pace {
-        public String runner;
-        public String split;
-        public long lastTime;
-
-        public Pace(String runner, String split, long lastTime) {
-            this.runner = runner;
-            this.split = Paceman.getSplitDesc(split);
-            this.lastTime = lastTime;
-        }
-
-        @Override
-        public String toString() {
-            return "Pace{" +
-                    "runner='" + runner + '\'' +
-                    ", split='" + split + '\'' +
-                    ", lastTime=" + lastTime +
-                    '}';
         }
     }
 }

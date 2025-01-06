@@ -2,6 +2,7 @@ package com.cylorun.gui;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
+import com.cylorun.model.Pace;
 import com.cylorun.paceman.Paceman;
 import com.google.gson.JsonObject;
 
@@ -48,7 +49,7 @@ public class EventPaceWindow extends JFrame {
         boolean hasData = false;
 
         for (JsonObject r : Paceman.getPaceForEvent(eventId)) {
-            Paceman.Pace pace = Paceman.getLastEventPace(r);
+            Pace pace = Paceman.getLastEventPace(r);
             if (pace == null) continue;
 
             hasData = true;
