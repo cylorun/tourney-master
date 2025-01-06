@@ -93,23 +93,13 @@ public class TourneyMasterWindow extends JFrame {
     private JPanel createSwitchScenePanel() {
         JPanel scenePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        JComboBox<String> sceneBox = new JComboBox<>();
-        SwingUtilities.invokeLater(() -> {
-            sceneBox.removeAllItems();
-            for (String name : List.of("Main","Intermission")) {
-                sceneBox.addItem(name);
-            }
-        });
+        scenePanel.add(new ActionButton("Intermission", (e)-> {
+            OBSController.getInstance().openScene("Intermission");
+        }));
 
-        sceneBox.addActionListener((e) -> {
-            String item = (String) sceneBox.getSelectedItem();
-            if (item == null) {
-                return;
-            }
-            OBSController.getInstance().openScene(item);
-        });
-
-        scenePanel.add(sceneBox);
+        scenePanel.add(new ActionButton("Main", (e)-> {
+            OBSController.getInstance().openScene("Main");
+        }));
 
         return scenePanel;
     }

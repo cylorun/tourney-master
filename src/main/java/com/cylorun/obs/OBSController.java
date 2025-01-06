@@ -69,6 +69,7 @@ public class OBSController {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(OBS_IN))) {
             writer.write(data);
             writer.flush();
+            TourneyMaster.log(Level.INFO, "Writing OBS State: " + data);
         } catch (IOException e) {
             TourneyMaster.log(Level.SEVERE, "Error writing to OBS state file: " + e.getMessage());
             throw new RuntimeException(e);
