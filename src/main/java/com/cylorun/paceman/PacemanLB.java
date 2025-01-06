@@ -23,7 +23,7 @@ import java.util.logging.Level;
 public class PacemanLB  implements Runnable {
 
     public static final Path OUT_FILE = TourneyMasterOptions.getTrackerDir().resolve("lb.txt");
-    private static final PacemanLB INSTANCE = new PacemanLB(TourneyMasterOptions.getInstance().paceman_eventid);
+    private static PacemanLB instance;;
     private URI compmetionsURL;
     private PacemanLB(String eventId) {
         try {
@@ -45,7 +45,11 @@ public class PacemanLB  implements Runnable {
     }
 
     public static PacemanLB getInstance() {
-        return INSTANCE;
+        if (instance == null) {
+            instance = new PacemanLB(TourneyMasterOptions.getInstance().paceman_eventid);
+        }
+
+        return instance;
     }
 
     private static void writeToOut(String s) throws IOException {

@@ -21,7 +21,8 @@ public class EventPaceWindow extends JFrame {
         this.initUI();
 
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() ->
-                SwingUtilities.invokeLater(this::reloadRuns), 0L, 10L, TimeUnit.SECONDS);
+                SwingUtilities.invokeLater(this::reloadRuns), 0L, 10L, TimeUnit.SECONDS
+        );
     }
 
     private void initUI() {
@@ -49,7 +50,7 @@ public class EventPaceWindow extends JFrame {
         boolean hasData = false;
 
         for (JsonObject r : Paceman.getPaceForEvent(eventId)) {
-            Pace pace = Paceman.getLastEventPace(r);
+            Pace pace = Paceman.getLatestSplitPace(r);
             if (pace == null) continue;
 
             hasData = true;

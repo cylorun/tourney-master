@@ -10,8 +10,8 @@ import java.util.List;
 
 public class StreamManager extends JPanel {
 
-    private List<StreamerPanel> selectedStreamers;
-    private List<Player> ttvNames;
+    private final List<StreamerPanel> selectedStreamers;
+    private final List<Player> ttvNames;
 
     public StreamManager(List<Player> ttvNames, int rows, int cols) {
         super(new GridLayout(rows, cols, 10, 10));
@@ -58,7 +58,7 @@ public class StreamManager extends JPanel {
     public static class StreamerPanel extends JPanel {
         private final JCheckBox activeCheck;
         private Player streamer;
-        private JComboBox<String> streamerDropdown;
+        private final JComboBox<String> streamerDropdown;
         private Runnable onCheckBoxChange;
         private final int idx; // 1 based index for obs
 

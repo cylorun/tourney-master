@@ -22,6 +22,8 @@ public class TourneyMaster {
 
         PacemanLB.getInstance();
 
+        OBSController.getInstance();
+
         new Thread(() -> {
             OBSController.downloadObsScript(TourneyMasterOptions.getTrackerDir());
         }, "DownloadController").start();
@@ -37,11 +39,11 @@ public class TourneyMaster {
             System.out.printf("[%s/%s] %s%n", "WARNING", time, s.toString());
         } else if (level.equals(Level.SEVERE)) {
             System.err.printf("[%s/%s] %s%n", "SEVERE", time, s.toString());
+            showError("Something went wrong :/\n" + s);
         }
     }
 
     public static void showError(String msg) {
-        log(Level.SEVERE, msg);
         JOptionPane.showMessageDialog(null, msg, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
@@ -52,10 +54,5 @@ public class TourneyMaster {
         long seconds = remainingSeconds % 60;
 
         return String.format("%02d:%02d", minutes, seconds);
-    }
-
-    public static void stop() {
-        log(Level.INFO, "Quitting...");
-        System.exit(1);
     }
 }

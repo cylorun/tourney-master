@@ -32,8 +32,6 @@ public class TourneyMasterWindow extends JFrame {
         this.initComponents();
 
         this.setVisible(true);
-
-//        OBSController.getInstance(); // connects to obs
     }
 
     private void initComponents() {

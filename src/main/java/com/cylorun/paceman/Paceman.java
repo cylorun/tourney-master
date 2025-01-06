@@ -20,7 +20,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 public class Paceman {
-
     private static final URI LIVERUNS_URI;
 
     static {
@@ -69,7 +68,11 @@ public class Paceman {
         return event.map(jsonObject -> jsonObject.get("whitelist").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()).orElseGet(List::of);
     }
 
-    public static Pace getLastEventPace(JsonObject runObj) {
+    /**
+     * @param runObj Paceman live run data, from https://paceman.gg/api/ars/liveruns
+     * @return a Pace object, containing data for the last event in a run
+     */
+    public static Pace getLatestSplitPace(JsonObject runObj) {
         JsonElement ttv = runObj.getAsJsonObject("user").get("liveAccount");
         if (ttv == null ||ttv.isJsonNull()) {
             return null;
