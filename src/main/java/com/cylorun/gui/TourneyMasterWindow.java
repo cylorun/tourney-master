@@ -64,7 +64,7 @@ public class TourneyMasterWindow extends JFrame {
         switchScenePanel.setBorder(BorderFactory.createTitledBorder("Scene Control"));
         southPanel.add(switchScenePanel, BorderLayout.CENTER);
 
-        JPanel switchViewButton = createSwitchViewButton(String.format("Switch to %s View", role.equals("host") ? "commentator" : "host"));
+        JPanel switchViewButton = this.createSwitchViewButton(String.format("Switch to %s View", role.equals("host") ? "commentator" : "host"));
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.add(switchViewButton);
 
@@ -115,7 +115,7 @@ public class TourneyMasterWindow extends JFrame {
 
         hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("General Settings"));
 
-        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators", options.enable_commentators, (newVal) -> {
+        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators (WIP does nothing)", options.enable_commentators, (newVal) -> {
             options.enable_commentators = newVal;
             TourneyMasterOptions.save();
         });
@@ -218,6 +218,7 @@ public class TourneyMasterWindow extends JFrame {
     }
 
     private void switchView(ActionEvent event) {
+        JOptionPane.showMessageDialog(this, "This is a WIP :0");
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to switch views?",
                 "Confirm Switch",

@@ -6,7 +6,7 @@ plugins {
 shadowJar {
     from sourceSets.main.resources
 
-    archiveBaseName.set("btrl-master")
+    archiveBaseName.set("tourney-master")
     archiveVersion.set("v"+project.version as String)
     archiveClassifier.set("")
 }
