@@ -219,6 +219,9 @@ public class TourneyMasterWindow extends JFrame {
 
     private void switchView(ActionEvent event) {
         JOptionPane.showMessageDialog(this, "This is a WIP :0");
+        if (true) {
+            return;
+        }
         int confirm = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to switch views?",
                 "Confirm Switch",
