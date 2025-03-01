@@ -145,11 +145,4 @@ public class PlayerConfigWindow extends JFrame {
 
         popupMenu.show(e.getComponent(), e.getX(), e.getY());
     }
-
-    public static void main(String[] args) throws UnsupportedLookAndFeelException {
-        UIManager.setLookAndFeel(new FlatDarculaLaf());
-        SwingUtilities.invokeLater(() -> {
-            PlayerConfigWindow window = PlayerConfigWindow.getInstance();
-        });
-    }
 }
