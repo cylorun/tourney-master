@@ -22,6 +22,7 @@ public class TourneyMasterWindow extends JFrame {
     private JPanel commentatorView;
     private JPanel hostView;
     private JPanel currentView;
+    private JPanel streamersPanel;
 
     private TourneyMasterWindow() {
         this.setTitle("Tourney Master " + com.cylorun.TourneyMaster.VERSION);
@@ -44,6 +45,20 @@ public class TourneyMasterWindow extends JFrame {
         this.add(this.currentView, BorderLayout.CENTER);
     }
 
+    private void reloadStreamersPanel() {
+        if (this.streamersPanel != null) {
+            this.currentView.remove(this.streamersPanel);
+        }
+
+        this.streamersPanel = this.createStreamersPanel();
+        this.streamersPanel.setBorder(BorderFactory.createTitledBorder("Stream Management"));
+        this.currentView.add(this.streamersPanel, BorderLayout.CENTER);
+
+        this.currentView.revalidate();
+        this.currentView.repaint();
+    }
+
+
 
     private JPanel createMainView(String role) {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
@@ -55,12 +70,12 @@ public class TourneyMasterWindow extends JFrame {
             panel.add(this.createCommentatorConfigPanel(), BorderLayout.NORTH);
         }
 
-        JPanel streamersPanel = createStreamersPanel();
-        streamersPanel.setBorder(BorderFactory.createTitledBorder("Stream Management"));
-        panel.add(streamersPanel, BorderLayout.CENTER);
+        this.streamersPanel = this.createStreamersPanel();
+        this.streamersPanel.setBorder(BorderFactory.createTitledBorder("Stream Management"));
+        panel.add(this.streamersPanel, BorderLayout.CENTER);
 
         JPanel southPanel = new JPanel(new BorderLayout(5, 5));
-        JPanel switchScenePanel = createSwitchScenePanel();
+        JPanel switchScenePanel = this.createSwitchScenePanel();
         switchScenePanel.setBorder(BorderFactory.createTitledBorder("Scene Control"));
         southPanel.add(switchScenePanel, BorderLayout.CENTER);
 
@@ -125,14 +140,28 @@ public class TourneyMasterWindow extends JFrame {
             TourneyMasterOptions.save();
         });
 
-        TextOptionField pacemanEventId = new TextOptionField("Paceman Event id", options.paceman_eventid, (newVal) -> {
-           options.paceman_eventid = newVal;
-           PacemanLB.getInstance().setEventId(newVal);
-           TourneyMasterOptions.save();
+        TextOptionField pacemanEventId = new TextOptionField("Paceman Event ID", options.paceman_eventid, (newVal) -> {
+            options.paceman_eventid = newVal;
+            PacemanLB.getInstance().setEventId(newVal);
+            TourneyMasterOptions.save();
         });
 
         NumberOptionField maxLbEntries = new NumberOptionField("Max LB Entries", options.max_lb_entries, (newVal) -> {
             options.max_lb_entries = newVal;
+            TourneyMasterOptions.save();
+        });
+
+        NumberOptionField rowsOptionField = new NumberOptionField("Rows", options.rows, (newVal) -> {
+            options.rows = newVal;
+
+            this.reloadStreamersPanel();
+            TourneyMasterOptions.save();
+        });
+
+        NumberOptionField colsOptionField = new NumberOptionField("Columns", options.cols, (newVal) -> {
+            options.cols = newVal;
+
+            this.reloadStreamersPanel();
             TourneyMasterOptions.save();
         });
 
@@ -148,7 +177,7 @@ public class TourneyMasterWindow extends JFrame {
             try {
                 Desktop.getDesktop().open(TourneyMasterOptions.getTrackerDir().toFile());
             } catch (IOException ex) {
-                TourneyMaster.log(Level.SEVERE, "Failed to open config folder ;?");
+                TourneyMaster.log(Level.SEVERE, "Failed to open config folder");
                 throw new RuntimeException(ex);
             }
         });
@@ -157,52 +186,53 @@ public class TourneyMasterWindow extends JFrame {
             this.createPlayerSources();
         });
 
+        // Layout Configurations
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.insets = new Insets(8, 10, 8, 10); // Added more spacing for better readability
+        gbc.anchor = GridBagConstraints.WEST;
 
+        int row = 0;
+
+        // first col
         gbc.gridx = 0;
-        gbc.gridy = 0;
+        gbc.gridy = row++;
         hostSettingsPanel.add(enablePacemanLb, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridy = row++;
         hostSettingsPanel.add(enableCommentatorsCheck, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridy = row++;
         hostSettingsPanel.add(pacemanEventId, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
+        gbc.gridy = row++;
         hostSettingsPanel.add(maxLbEntries, gbc);
 
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
+        gbc.gridy = row++;
+        hostSettingsPanel.add(rowsOptionField, gbc);
+
+        gbc.gridy = row++;
+        hostSettingsPanel.add(colsOptionField, gbc);
+
+        // 2nd col
+        gbc.gridx = 1;
+        gbc.gridy = 0;
         gbc.anchor = GridBagConstraints.CENTER;
+
         hostSettingsPanel.add(playerButton, gbc);
 
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridy++;
         hostSettingsPanel.add(genPlayerSources, gbc);
 
-        gbc.gridx = 0;
         gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
         hostSettingsPanel.add(paceButton, gbc);
 
-        gbc.gridx = 1;
-//        gbc.gridy++;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.gridy++;
         hostSettingsPanel.add(openConfigFolder, gbc);
-
 
         return hostSettingsPanel;
     }
+
 
     private void createPlayerSources() {
         if (JOptionPane.showConfirmDialog(this, "Are you sure you want to create player sources?\nThis will mess up the previous sources", "Confirmation", JOptionPane.YES_NO_OPTION)
