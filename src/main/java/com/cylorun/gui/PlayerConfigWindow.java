@@ -1,6 +1,7 @@
 package com.cylorun.gui;
 
 import com.cylorun.TourneyMasterOptions;
+import com.cylorun.gui.components.ActionButton;
 import com.cylorun.model.Player;
 import com.formdev.flatlaf.FlatDarculaLaf;
 
@@ -86,8 +87,18 @@ public class PlayerConfigWindow extends JFrame {
         addButton.setFont(new Font("Arial", Font.BOLD, 20));
         addButton.addActionListener(e -> PlayerConfigWindow.this.addNewPlayer());
 
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(addButton);
+        buttonPanel.add(new ActionButton("Remove all", (e) -> {
+            if (JOptionPane.showConfirmDialog(this, "are you sure") == JOptionPane.YES_OPTION) {
+                for (int i = this.tableModel.getRowCount() - 1; i >= 0; i--) {
+                    this.tableModel.removeRow(i);
+                }
+
+                this.save();
+            }
+        }));
 
         this.add(scrollPane, BorderLayout.CENTER);
         this.add(buttonPanel, BorderLayout.SOUTH);
