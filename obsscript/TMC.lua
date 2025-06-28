@@ -211,7 +211,7 @@ function create_player_group(scene_name, group_name)
     obs.script_log(obs.LOG_INFO, "Created and added browser and text sources to scene: " .. scene_name)
 end
 
-function edit_player_source(scene_name, num, new_name)
+function edit_player_source(scene_name, num, new_name, player_label)
     local browser_name = "p" .. num .. "-ttv"
     local label_name = "p" .. num .. "-label"
 
@@ -242,7 +242,7 @@ function edit_player_source(scene_name, num, new_name)
     local text_source = get_source(current_scene, label_name)
     if text_source then
         local settings = obs.obs_source_get_settings(text_source)
-        obs.obs_data_set_string(settings, "text", new_name)
+        obs.obs_data_set_string(settings, "text", player_label)
         obs.obs_source_update(text_source, settings)
         obs.obs_data_release(settings)
     else
@@ -391,12 +391,12 @@ function parse_instr(instruction, args)
     end
 
     if instruction == "EditPlayerSource" then
-        if not args or #args ~= 3 then
+        if not args or #args ~= 4 then
             return false, "Invalid arguments"
         end
 
-        local scene_name, num, ttv_name = args[1], args[2], args[3]
-        edit_player_source(scene_name, num, ttv_name)
+        local scene_name, num, ttv_name, player_label = args[1], args[2], args[3], args[4]
+        edit_player_source(scene_name, num, ttv_name, player_label)
 
 
         return true

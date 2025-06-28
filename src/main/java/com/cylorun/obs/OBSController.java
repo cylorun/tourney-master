@@ -78,11 +78,11 @@ public class OBSController {
         this.sendOBS("GenPlayerSources:" + sceneName + ";" + count);
     }
 
-    public void editPlayerSource(int num, String newttv) {
-        this.editPlayerSource("Main", num, newttv);
+    public void editPlayerSource(int num, String newttv, String label) {
+        this.editPlayerSource("Main", num, newttv, label);
     }
 
-    public void editPlayerSource(String sceneName, int num, String newttv) {
+    public void editPlayerSource(String sceneName, int num, String newttv, String label) {
         this.sendOBS(String.format("EditPlayerSource:%s;%s;%s", sceneName, num, newttv));
     }
 

@@ -22,7 +22,7 @@ GenPlayerSources:<scene name>;<count>
 ```
 **Change player source to diff streamer**
 ```
-EditPlayerSource:<scene name>;<source number>;<new ttv name>
+EditPlayerSource:<scene name>;<source number>;<new ttv name>;<player label>
 ```
 Gets label and broser sources starting with p{source number} and change their properties based on the "new ttv name"
 
