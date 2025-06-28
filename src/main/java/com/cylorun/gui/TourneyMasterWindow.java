@@ -129,11 +129,11 @@ public class TourneyMasterWindow extends JFrame {
         JPanel hostSettingsPanel = new JPanel(new GridBagLayout());
 
         hostSettingsPanel.setBorder(BorderFactory.createTitledBorder("General Settings"));
-
-        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators (WIP does nothing)", options.enable_commentators, (newVal) -> {
-            options.enable_commentators = newVal;
-            TourneyMasterOptions.save();
-        });
+//
+//        BooleanOptionField enableCommentatorsCheck = new BooleanOptionField("Enable Commentators (WIP does nothing)", options.enable_commentators, (newVal) -> {
+//            options.enable_commentators = newVal;
+//            TourneyMasterOptions.save();
+//        });
 
         BooleanOptionField enablePacemanLb = new BooleanOptionField("Enable Paceman LB", options.enable_paceman_lb, (newVal) -> {
             options.enable_paceman_lb = newVal;
@@ -199,8 +199,8 @@ public class TourneyMasterWindow extends JFrame {
         gbc.gridy = row++;
         hostSettingsPanel.add(enablePacemanLb, gbc);
 
-        gbc.gridy = row++;
-        hostSettingsPanel.add(enableCommentatorsCheck, gbc);
+//        gbc.gridy = row++;
+//        hostSettingsPanel.add(enableCommentatorsCheck, gbc);
 
         gbc.gridy = row++;
         hostSettingsPanel.add(pacemanEventId, gbc);
