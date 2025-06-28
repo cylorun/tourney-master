@@ -8,11 +8,15 @@ import com.google.gson.JsonObject;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 public class EventPaceWindow extends JFrame {
-
+    public boolean enabled = true;
+    private String disabledReason = "";
+    private JLabel headerLabel;
     private JPanel pacePanel;
     private static EventPaceWindow instance;
 
@@ -28,10 +32,10 @@ public class EventPaceWindow extends JFrame {
     private void initUI() {
         this.setLayout(new BorderLayout());
 
-        JLabel headerLabel = new JLabel("Pace Tracker", JLabel.CENTER);
-        headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        headerLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        this.add(headerLabel, BorderLayout.NORTH);
+        this.headerLabel = new JLabel("Pace Tracker", JLabel.CENTER);
+        this.headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        this.headerLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+        this.add(this.headerLabel, BorderLayout.NORTH);
 
         this.pacePanel = new JPanel();
         this.pacePanel.setLayout(new BoxLayout(this.pacePanel, BoxLayout.Y_AXIS));
@@ -44,12 +48,22 @@ public class EventPaceWindow extends JFrame {
     }
 
     private void reloadRuns() {
+        if (!enabled) return;
+
         this.pacePanel.removeAll();
 
         String eventId = TourneyMasterOptions.getInstance().paceman_eventid;
         boolean hasData = false;
 
-        for (JsonObject r : Paceman.getPaceForEvent(eventId)) {
+        List<JsonObject> paces = Paceman.getPaceForEvent(eventId);
+        if (paces == null) {
+            this.enabled = false;
+            this.headerLabel.setText("Invalid EventID, pace disabled");
+            TourneyMaster.log(Level.WARNING, "Invalid EventID, disabling event pace fetcher");
+            return;
+        }
+
+        for (JsonObject r : paces) {
             Pace pace = Paceman.getLatestSplitPace(r);
             if (pace == null) continue;
 

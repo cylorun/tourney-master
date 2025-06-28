@@ -144,6 +144,8 @@ public class TourneyMasterWindow extends JFrame {
             options.paceman_eventid = newVal;
             PacemanLB.getInstance().setEventId(newVal);
             TourneyMasterOptions.save();
+
+            EventPaceWindow.getInstance().enabled = true; // set to true again, incase it got disabled before
         });
 
         NumberOptionField maxLbEntries = new NumberOptionField("Max LB Entries", options.max_lb_entries, (newVal) -> {

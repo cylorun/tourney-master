@@ -107,6 +107,10 @@ public class Paceman {
                 .build();
 
         List<String> players = getPlayersForEvent(eventId);
+        if (players == null || players.isEmpty()) {
+            return null;
+        }
+
         try {
             HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
             if (res.statusCode() != 200) {
