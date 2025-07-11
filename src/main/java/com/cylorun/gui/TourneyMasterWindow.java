@@ -142,7 +142,7 @@ public class TourneyMasterWindow extends JFrame {
             TourneyMasterOptions.save();
         });
 
-        MultiChoiceOptionField pacemanEventId = new MultiChoiceOptionField(new String[]{}, options.paceman_eventid, "Paceman Event ID", (newVal) -> {
+        MultiChoiceOptionField pacemanEventId = new MultiChoiceOptionField(new String[]{}, options.paceman_eventid, "Paceman Event", (newVal) -> {
             Optional<PacemanEvent> opt = Paceman.getEventByVanity(newVal);
             if (opt.isPresent()) { // there is alr logging if it's empty in getEventByVanity
                 options.paceman_eventid = opt.get()._id;
