@@ -3,7 +3,6 @@ package com.cylorun.gui;
 import com.cylorun.TourneyMasterOptions;
 import com.cylorun.gui.components.ActionButton;
 import com.cylorun.model.Player;
-import com.formdev.flatlaf.FlatDarculaLaf;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -38,7 +37,7 @@ public class PlayerConfigWindow extends JFrame {
         this.setSize(600, 400);
         this.setLayout(new BorderLayout());
 
-        this.tableModel = new DefaultTableModel(new Object[]{"Twitch Name", "In-Game Name"}, 0) {
+        this.tableModel = new DefaultTableModel(new Object[]{"Twitch Name", "Label (name/pronouns/whatever)"}, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return column == 0 || column == 1;
@@ -48,7 +47,7 @@ public class PlayerConfigWindow extends JFrame {
             public void setValueAt(Object value, int row, int col) {
                 if (value instanceof String str) {
                     System.out.println(str);
-                    PlayerConfigWindow.this.save();
+//                    PlayerConfigWindow.this.save();
                 }
 
                 super.setValueAt(value, row, col);
@@ -58,6 +57,18 @@ public class PlayerConfigWindow extends JFrame {
         this.playerTable = new JTable(this.tableModel);
         this.playerTable.setRowHeight(30);
         JScrollPane scrollPane = new JScrollPane(this.playerTable);
+
+        this.playerTable.getDefaultEditor(String.class).addCellEditorListener(new javax.swing.event.CellEditorListener() {
+            @Override
+            public void editingStopped(javax.swing.event.ChangeEvent e) {
+                PlayerConfigWindow.this.save();
+            }
+
+            @Override
+            public void editingCanceled(javax.swing.event.ChangeEvent e) {
+            }
+        });
+
 
         this.playerTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -119,7 +130,7 @@ public class PlayerConfigWindow extends JFrame {
             String twitchName = (String) model.getValueAt(row, 0); // col 1
             String ign = (String) model.getValueAt(row, 1); // col 2
 
-            System.out.println("Row " + row + ": Twitch Name = " + twitchName + ", In-Game Name = " + ign);
+            System.out.println("Row " + row + ": Twitch Name = " + twitchName + ", Player Label= " + ign);
             options.players.add(new Player(twitchName, ign));
         }
 
@@ -127,14 +138,14 @@ public class PlayerConfigWindow extends JFrame {
     }
 
     private void addNewPlayer() {
-        this.tableModel.addRow(new Object[]{"New Player", ""});
+        this.tableModel.addRow(new Object[]{"New Player", "they/them 7:01 pb"});
     }
 
     private void loadData() {
         TourneyMasterOptions options  = TourneyMasterOptions.getInstance();
 
         for (Player p : options.players) {
-            this.tableModel.addRow(new Object[]{p.twitch, p.ign});
+            this.tableModel.addRow(new Object[]{p.twitch, p.label});
         }
     }
 

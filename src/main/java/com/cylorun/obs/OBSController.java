@@ -83,7 +83,7 @@ public class OBSController {
     }
 
     public void editPlayerSource(String sceneName, int num, String newttv, String label) {
-        this.sendOBS(String.format("EditPlayerSource:%s;%s;%s", sceneName, num, newttv));
+        this.sendOBS(String.format("EditPlayerSource:%s;%s;%s;%s", sceneName, num, newttv, label));
     }
 
     public void swapPlayerSources(int src1, int src2) {

@@ -79,7 +79,7 @@ public class StreamManager extends JPanel {
                         .findFirst()
                         .orElse(this.streamer);
 
-                OBSController.getInstance().editPlayerSource(this.idx, this.streamer.twitch, this.streamer.ign);
+                OBSController.getInstance().editPlayerSource(this.idx, this.streamer.twitch, this.streamer.label);
             }));
 
             this.activeCheck = new JCheckBox();

@@ -137,7 +137,7 @@ public class TourneyMasterWindow extends JFrame {
 //            TourneyMasterOptions.save();
 //        });
 
-        BooleanOptionField enablePacemanLb = new BooleanOptionField("Enable Paceman LB", options.enable_paceman_lb, (newVal) -> {
+        BooleanOptionField enablePacemanLb = new BooleanOptionField("Enable Paceman text LB", options.enable_paceman_lb, (newVal) -> {
             options.enable_paceman_lb = newVal;
             TourneyMasterOptions.save();
         });

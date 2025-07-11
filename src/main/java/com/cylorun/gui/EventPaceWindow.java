@@ -48,7 +48,7 @@ public class EventPaceWindow extends JFrame {
     }
 
     private void reloadRuns() {
-        if (!enabled) return;
+        if (!this.enabled) return;
 
         this.pacePanel.removeAll();
 
