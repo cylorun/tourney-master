@@ -21,6 +21,7 @@ public class TourneyMasterOptions {
     public boolean enable_commentators = false;
     public boolean enable_paceman_lb = false;
     public String paceman_eventid = "";
+    public String paceman_eventvanity = "";
     public List<Player> players = new ArrayList<>();
     public String lastView = "host"; // commentator | host
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();

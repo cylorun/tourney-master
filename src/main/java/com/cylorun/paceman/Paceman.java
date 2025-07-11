@@ -2,10 +2,8 @@ package com.cylorun.paceman;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.model.Pace;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.cylorun.model.PacemanEvent;
+import com.google.gson.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -30,42 +28,60 @@ public class Paceman {
         }
     }
 
-    public static Optional<JsonObject> getEventById(String eventId) {
+    public static List<PacemanEvent> getAllPacemanEvents() {
         HttpClient client = HttpClient.newHttpClient();
-        try {
 
+        try {
             HttpRequest req = HttpRequest.newBuilder()
                     .uri(new URI("https://paceman.gg/api/get-events"))
                     .GET()
                     .build();
 
             HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
-            if (res.statusCode() != 200) {
-                TourneyMaster.log(Level.SEVERE, "Failed to fetch events from paceman.gg/api/ars/liveruns: code " + res.statusCode());
-                return Optional.empty();
-            }
+            System.out.println(res);
+            PacemanEvent[] events = new Gson().fromJson(res.body(), PacemanEvent[].class);
 
-            Optional<JsonElement> event = JsonParser.parseString(res.body()).getAsJsonArray()
-                    .asList()
-                    .stream()
-                    .filter(evt -> evt.getAsJsonObject().get("_id").getAsString().equalsIgnoreCase(eventId))
-                    .findFirst();
+            return List.of(events);
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            TourneyMaster.log(Level.SEVERE, "Failed to fetch paceman events");
 
-            if (event.isEmpty()) {
-                TourneyMaster.log(Level.SEVERE, "Event with this id does not exist: " + eventId);
-                return Optional.empty();
-            }
+            return List.of();
+        } catch (JsonParseException e) {
+            TourneyMaster.log(Level.SEVERE, "Failed to parse JSON payload from paceman.gg/api/get-events");
 
-            return Optional.of(event.get().getAsJsonObject());
-        } catch (IOException | InterruptedException | URISyntaxException e) {
-            throw new RuntimeException(e);
+            return List.of();
+        }
+    }
+
+    public static Optional<PacemanEvent> getEventById(String eventId) {
+        Optional<PacemanEvent> event = Paceman.getAllPacemanEvents().stream()
+                .filter(evt -> evt._id.equalsIgnoreCase(eventId))
+                .findFirst();
+
+        if (event.isEmpty()) {
+            TourneyMaster.log(Level.SEVERE, "Event with this id does not exist: " + eventId);
+            return Optional.empty();
         }
 
+        return Optional.of(event.get());
+    }
+
+    public static Optional<PacemanEvent> getEventByVanity(String vanity) {
+        Optional<PacemanEvent> event = Paceman.getAllPacemanEvents().stream()
+                .filter(evt -> evt.vanity.equalsIgnoreCase(vanity))
+                .findFirst();
+
+        if (event.isEmpty()) {
+            TourneyMaster.log(Level.SEVERE, "Event with this vanity does not exist: " + vanity);
+            return Optional.empty();
+        }
+
+        return event;
     }
 
     public static List<String> getPlayersForEvent(String eventId) {
-        Optional<JsonObject> event = getEventById(eventId);
-        return event.map(jsonObject -> jsonObject.get("whitelist").getAsJsonArray().asList().stream().map(JsonElement::getAsString).toList()).orElseGet(List::of);
+        Optional<PacemanEvent> event = getEventById(eventId);
+        return event.map((d) -> d.whitelist).orElse(List.of());
     }
 
     /**

@@ -2,10 +2,10 @@ package com.cylorun.gui;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
-import com.cylorun.gui.components.ActionButton;
-import com.cylorun.gui.components.BooleanOptionField;
-import com.cylorun.gui.components.NumberOptionField;
-import com.cylorun.gui.components.TextOptionField;
+import com.cylorun.gui.components.*;
+import com.cylorun.model.Pace;
+import com.cylorun.model.PacemanEvent;
+import com.cylorun.paceman.Paceman;
 import com.cylorun.paceman.PacemanLB;
 import com.cylorun.obs.OBSController;
 
@@ -14,6 +14,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.FutureTask;
 import java.util.logging.Level;
 
 public class TourneyMasterWindow extends JFrame {
@@ -57,7 +60,6 @@ public class TourneyMasterWindow extends JFrame {
         this.currentView.revalidate();
         this.currentView.repaint();
     }
-
 
 
     private JPanel createMainView(String role) {
@@ -106,11 +108,11 @@ public class TourneyMasterWindow extends JFrame {
     private JPanel createSwitchScenePanel() {
         JPanel scenePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
-        scenePanel.add(new ActionButton("Intermission", (e)-> {
+        scenePanel.add(new ActionButton("Intermission", (e) -> {
             OBSController.getInstance().openScene("Intermission");
         }));
 
-        scenePanel.add(new ActionButton("Main", (e)-> {
+        scenePanel.add(new ActionButton("Main", (e) -> {
             OBSController.getInstance().openScene("Main");
         }));
 
@@ -140,12 +142,23 @@ public class TourneyMasterWindow extends JFrame {
             TourneyMasterOptions.save();
         });
 
-        TextOptionField pacemanEventId = new TextOptionField("Paceman Event ID", options.paceman_eventid, (newVal) -> {
-            options.paceman_eventid = newVal;
-            PacemanLB.getInstance().setEventId(newVal);
-            TourneyMasterOptions.save();
+        MultiChoiceOptionField pacemanEventId = new MultiChoiceOptionField(new String[]{}, options.paceman_eventid, "Paceman Event ID", (newVal) -> {
+            Optional<PacemanEvent> opt = Paceman.getEventByVanity(newVal);
+            if (opt.isPresent()) { // there is alr logging if it's empty in getEventByVanity
+                options.paceman_eventid = opt.get()._id;
+                options.paceman_eventvanity = opt.get().vanity;
+                PacemanLB.getInstance().setEventId(newVal);
+                TourneyMasterOptions.save();
 
-            EventPaceWindow.getInstance().enabled = true; // set to true again, incase it got disabled before
+                EventPaceWindow.getInstance().enabled = true; // set to true again, incase it got disabled before
+            }
+        });
+
+
+        CompletableFuture.runAsync(() -> {
+           String[] events = Paceman.getAllPacemanEvents()
+                   .stream().map((e) -> e.vanity).toArray(String[]::new);
+           pacemanEventId.setOptions(events, options.paceman_eventvanity);
         });
 
         NumberOptionField maxLbEntries = new NumberOptionField("Max LB Entries", options.max_lb_entries, (newVal) -> {
