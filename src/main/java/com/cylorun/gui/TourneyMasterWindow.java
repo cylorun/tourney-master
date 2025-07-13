@@ -147,7 +147,7 @@ public class TourneyMasterWindow extends JFrame {
             if (opt.isPresent()) { // there is alr logging if it's empty in getEventByVanity
                 options.paceman_eventid = opt.get()._id;
                 options.paceman_eventvanity = opt.get().vanity;
-                PacemanLB.getInstance().setEventId(newVal);
+                PacemanLB.getInstance().setEvent(opt.get());
                 TourneyMasterOptions.save();
 
                 EventPaceWindow.getInstance().enabled = true; // set to true again, incase it got disabled before

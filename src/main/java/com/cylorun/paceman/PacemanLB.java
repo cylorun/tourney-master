@@ -2,6 +2,7 @@ package com.cylorun.paceman;
 
 import com.cylorun.TourneyMaster;
 import com.cylorun.TourneyMasterOptions;
+import com.cylorun.model.PacemanEvent;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -36,9 +37,13 @@ public class PacemanLB  implements Runnable {
         Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(this, 0L, 10L, TimeUnit.SECONDS);
     }
 
-    public void setEventId(String id) {
+    public void setEvent(PacemanEvent pme) {
         try {
-            this.compmetionsURL = new URI( String.format("https://paceman.gg/api/get-event-completions?eventId=%s", id));
+            String urlString = String.format("https://paceman.gg/api/get-event-completions?eventId=%s", pme._id);
+            if (pme.points != null) {
+                urlString+= "&usePoints=true";
+            }
+            this.compmetionsURL = new URI(urlString);
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -62,6 +67,7 @@ public class PacemanLB  implements Runnable {
     public void run() {
         if (!TourneyMasterOptions.getInstance().enable_paceman_lb) return;
         HttpClient client = HttpClient.newHttpClient();
+        System.out.println(this.compmetionsURL);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(this.compmetionsURL)
                 .GET()
