@@ -128,7 +128,9 @@ end
 
 function get_scene(name)
     local source = get_source(name)
-    if source == nil then return nil end
+    if source == nil then
+        return nil
+    end
 
     local scene = obs.obs_scene_from_source(source)
     release_source(source)
@@ -314,13 +316,20 @@ end
 
 function create_default_scenes()
     if not scene_exists("Main") then
+        obs.script_log(obs.LOG_INFO, "'Main' scene not found. Creating it.")
         create_scene("Main")
-    end
-    if not scene_exists("Intermission") then
-        create_scene("Intermission")
+    else
+        obs.script_log(obs.LOG_INFO, "'Main' scene already exists.")
     end
 
-    obs.script_log(obs.LOG_INFO, "Created default scenes")
+    if not scene_exists("Intermission") then
+        obs.script_log(obs.LOG_INFO, "'Intermission' scene not found. Creating it.")
+        create_scene("Intermission")
+    else
+        obs.script_log(obs.LOG_INFO, "'Intermission' scene already exists.")
+    end
+
+    obs.script_log(obs.LOG_INFO, "Finished create_default_scenes")
 end
 
 
@@ -425,15 +434,27 @@ function script_description ()
 
         <p>
         An interface between OBS and Tourney-Master
+        </p>
     ]]
 end
 
+
+local scenes_checked = false
+
+function on_event(event)
+    if event == obs.OBS_FRONTEND_EVENT_SCENE_LIST_CHANGED or event == obs.OBS_FRONTEND_EVENT_FINISHED_LOADING then
+        if not scenes_checked then
+            scenes_checked = true
+            create_default_scenes()
+        end
+    end
+end
 
 function script_load(settings)
     obs.script_log(obs.LOG_INFO, "Tourney Master loaded")
     --last_obsstate = get_obsstate()
     --obs.script_log(obs.LOG_INFO, last_obsstate)
-    create_default_scenes()
+    obs.obs_frontend_add_event_callback(on_event)
     obs.timer_add(tick, REFRESH_RATE_MS)
 end
 
