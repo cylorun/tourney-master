@@ -67,19 +67,19 @@ public class StreamManager extends JPanel {
             this.streamer = streamer;
             this.idx = idx;
 
-            this.streamerDropdown = new JComboBox<>(ttvNames.stream().map(p -> p.twitch).toArray(String[]::new));
-            this.streamerDropdown.setSelectedItem(streamer.twitch);
+            this.streamerDropdown = new JComboBox<>(ttvNames.stream().map(p -> p.getTwitch()).toArray(String[]::new));
+            this.streamerDropdown.setSelectedItem(streamer.getTwitch());
 
             this.add(streamerDropdown, BorderLayout.CENTER);
 
             this.streamerDropdown.addActionListener((e -> {
                 String selectedTwitch = (String) this.streamerDropdown.getSelectedItem();
                 this.streamer = ttvNames.stream()
-                        .filter(p -> p.twitch.equals(selectedTwitch))
+                        .filter(p -> p.getTwitch().equals(selectedTwitch))
                         .findFirst()
                         .orElse(this.streamer);
 
-                OBSController.getInstance().editPlayerSource(this.idx, this.streamer.twitch, this.streamer.label);
+                OBSController.getInstance().editPlayerSource(this.idx, this.streamer.getTwitch(), this.streamer.getLabel());
             }));
 
             this.activeCheck = new JCheckBox();
@@ -98,7 +98,7 @@ public class StreamManager extends JPanel {
 
         public void setStreamer(Player p) {
             this.streamer = p;
-            this.streamerDropdown.setSelectedItem(p.twitch);
+            this.streamerDropdown.setSelectedItem(p.getTwitch());
         }
 
         public int getIdx() {
@@ -106,7 +106,7 @@ public class StreamManager extends JPanel {
         }
 
         public void updateDropdownSelection() {
-            this.streamerDropdown.setSelectedItem(this.streamer.twitch);
+            this.streamerDropdown.setSelectedItem(this.streamer.getTwitch());
         }
 
         public void onCheckBoxChange(Runnable onChange) {

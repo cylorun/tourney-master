@@ -145,7 +145,7 @@ public class PlayerConfigWindow extends JFrame {
         TourneyMasterOptions options  = TourneyMasterOptions.getInstance();
 
         for (Player p : options.players) {
-            this.tableModel.addRow(new Object[]{p.twitch, p.label});
+            this.tableModel.addRow(new Object[]{p.getTwitch(), p.getLabel()});
         }
     }
 

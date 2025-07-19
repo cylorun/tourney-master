@@ -1,12 +1,20 @@
 package com.cylorun.model;
 
 public class Player {
-    public String twitch;
-    public String label;
+    private final String twitch;
+    private final String label;
 
     public Player(String twitch, String label){
-        this.twitch = twitch == null ? "" : twitch.trim();
-        this.label = label == null ? "" : label.trim();
+        this.twitch = twitch;
+        this.label = label;
+    }
+
+    public String getTwitch() {
+        return this.twitch == null ? "" : this.twitch.trim();
+    }
+
+    public String getLabel() {
+        return this.label == null || this.label.isBlank() ? this.twitch : this.label.trim();
     }
 
     @Override
